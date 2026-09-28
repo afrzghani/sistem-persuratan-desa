@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  password      String
+  name          String
+  role          String         @default("OPERATOR")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  issuedLetters IssuedLetter[]
+
+  @@map("users")
+}
+
+model Resident {
+  nik              String         @id @db.VarChar(16)
+  nama             String
+  tempatLahir      String
+  tanggalLahir     DateTime
+  jenisKelamin     String
+  golonganDarah    String?
+  alamat           String
+  rt               String?        @db.VarChar(5)
+  rw               String?        @db.VarChar(5)
+  kelDesa          String         @default("Gempolkurung")
+  kecamatan        String         @default("Menganti")
+  kabupaten        String         @default("Gresik")
+  agama            String?
+  statusPerkawinan String?
+  pekerjaan        String?
+  kewarganegaraan  String         @default("WNI")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  issuedLetters    IssuedLetter[]
+
+  @@map("residents")
+}
+
+model LetterTemplate {
+  id            Int            @id @default(autoincrement())
+  kodeSurat     String         @unique
+  namaSurat     String
+  templateFile  String
+  deskripsi     String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  issuedLetters IssuedLetter[]
+
+  @@map("letter_templates")
+}
+
+model IssuedLetter {
+  id            Int            @id @default(autoincrement())
+  nomorSurat    String         @unique
+  residentNik   String         @db.VarChar(16)
+  resident      Resident       @relation(fields: [residentNik], references: [nik], onDelete: Restrict)
+  templateId    Int
+  template      LetterTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  operatorId    Int
+  operator      User           @relation(fields: [operatorId], references: [id], onDelete: Restrict)
+  keperluan     String         @db.Text
+  generatedFile String?
+  issuedAt      DateTime       @default(now())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("issued_letters")
+}
