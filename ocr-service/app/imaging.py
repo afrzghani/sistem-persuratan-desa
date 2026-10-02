@@ -3,6 +3,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 import numpy as np
 
 MAX_IMAGE_PIXELS = 16_000_000
+USE_GRAYSCALE = True
 
 class ImageValidationError(Exception):
     def __init__(self, message: str, status_code: int):
@@ -30,7 +31,8 @@ def validate_image(contents: bytes) -> dict:
                 "File tidak didukung", 415
             )
 
-        image.verify()
+        with Image.open(BytesIO(contents)) as image:
+            image.verify()
 
     except Image.DecompressionBombError:
         raise ImageValidationError(
@@ -59,13 +61,12 @@ def prepare_image(contents: bytes) -> np.ndarray:
             rgba = oriented.convert("RGBA")
             background = Image.new("RGBA", rgba.size, "white")
             background.alpha_composite(rgba)
-
             rgb = background.convert("RGB")
+            if USE_GRAYSCALE:
+                rgb = ImageOps.grayscale(rgb).convert("RGB")
             rgb_array = np.array(rgb)
+            return rgb_array[:, :, ::-1].copy()
 
-            bgr_array = rgb_array[:, :, ::-1].copy()
-
-            return bgr_array
 
     except (OSError, SyntaxError, ValueError):
         raise ImageValidationError(
