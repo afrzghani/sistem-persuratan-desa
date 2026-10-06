@@ -1,19 +1,19 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Home from './pages/home'
-import Login from './pages/login'
-import Dashboard from './pages/dashboard'
-import UploadKTP from './pages/uploadKTP'
-import Riwayat from './pages/riwayat'
-import ProtectedRoute from './components/ProtectedRoute'
-import Register from './pages/register'
-import KelolaAdmin from './pages/KelolaAdmin'
-import AdminLayout from './components/AdminLayout'
+import Login from "./pages/Login.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import UploadKTP from "./pages/UploadKTP.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Register from "./pages/Register.jsx";
+import KelolaAdmin from "./pages/KelolaAdmin.jsx";
+import AdminLayout from "./components/AdminHeader.jsx";
+import PengaturanDesa from "./pages/Pengaturan.jsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* Halaman publik */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
@@ -28,16 +28,17 @@ function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<UploadKTP />} />
-          <Route path="/riwayat" element={<Riwayat />} />
           <Route path="/kelola-admin" element={<KelolaAdmin />} />
           <Route path="/kelola-admin/register" element={<Register />} />
+          <Route
+            path="/pengaturan-desa"
+            element={<PengaturanDesa />}
+          />
         </Route>
 
-        {/* Home dari branch sebelumnya */}
-        <Route path="/home" element={<Home />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -12,28 +12,27 @@
 // Nanti saat backend sudah siap, fungsi login() akan diganti
 // dengan request ke API/backend.
 // ============================================================
-import { createContext, useState } from 'react'
-
-export const AuthContext = createContext(null)
+import { createContext, useState } from "react";
+export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   function login(email, password) {
-    if (email === 'admin@desa.id' && password === 'admin123') {
-      setIsAuthenticated(true)
-      return true
+    if (email === "admin@desa.id" && password === "admin123") {
+      setIsAuthenticated(true);
+      return true;
     }
-    return false
+    return false;
   }
 
   function logout() {
-    setIsAuthenticated(false)
+    setIsAuthenticated(false);
   }
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
