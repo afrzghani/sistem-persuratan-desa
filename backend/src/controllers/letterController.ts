@@ -11,7 +11,9 @@ export const generateLetterSchema = z.object({
   residentNik: z.string().length(16, 'NIK harus terdiri dari 16 digit'),
   templateId: z.number().int().positive(),
   nomorSurat: z.string().min(1, 'Nomor surat wajib diisi'),
-  keperluan: z.string().min(1, 'Keperluan surat wajib diisi')
+  keperluan: z.string().min(1, 'Keperluan surat wajib diisi'),
+  keterangan: z.string().optional(),
+  customData: z.record(z.unknown()).optional()
 });
 
 export const listTemplates = async (_req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -70,25 +72,69 @@ export const issueLetter = async (
       year: 'numeric'
     }).format(new Date(resident.tanggalLahir));
 
+    const fullAddress = resident.rt && resident.rw
+      ? `${resident.alamat} RT ${resident.rt} RW ${resident.rw}`
+      : resident.alamat;
+
     const templateVariables: LetterTemplateVariables = {
       nomor_surat: validated.nomorSurat,
+      no_surat: validated.nomorSurat,
       keperluan: validated.keperluan,
+      keterangan: validated.keterangan || 'orang tersebut di atas benar-benar penduduk Desa Gempolkurung Kecamatan Menganti Kabupaten Gresik dan sepanjang pengetahuan kami hingga saat ini belum pernah menikah (Jejaka / Perawan).',
       tanggal_surat: formattedTanggalSurat,
       nama: resident.nama,
       nik: resident.nik,
       tempat_lahir: resident.tempatLahir,
+      tempat: resident.tempatLahir,
       tanggal_lahir: formattedTanggalLahir,
+      tanggal: formattedTanggalLahir,
       jenis_kelamin: resident.jenisKelamin,
+      kelamin: resident.jenisKelamin,
       golongan_darah: resident.golonganDarah || '-',
-      alamat: resident.alamat,
+      alamat: fullAddress,
+      alamat_singkat: resident.alamat,
       rt: resident.rt || '-',
       rw: resident.rw || '-',
       kel_desa: resident.kelDesa,
+      desa: resident.kelDesa,
       kecamatan: resident.kecamatan,
+      kabupaten: resident.kabupaten,
       agama: resident.agama || '-',
       status_perkawinan: resident.statusPerkawinan || '-',
+      status_kawin: resident.statusPerkawinan || '-',
       pekerjaan: resident.pekerjaan || '-',
-      kewarganegaraan: resident.kewarganegaraan
+      kewarganegaraan: resident.kewarganegaraan,
+      kepala_desa: 'H. SUBANDI',
+
+      No_Surat: validated.nomorSurat,
+      Nomor_Surat: validated.nomorSurat,
+      Keperluan: validated.keperluan,
+      Keterangan: validated.keterangan || 'orang tersebut di atas benar-benar penduduk Desa Gempolkurung Kecamatan Menganti Kabupaten Gresik dan sepanjang pengetahuan kami hingga saat ini belum pernah menikah (Jejaka / Perawan).',
+      Tanggal_Surat: formattedTanggalSurat,
+      Nama: resident.nama,
+      NIK: resident.nik,
+      Tempat_Lahir: resident.tempatLahir,
+      Tempat: resident.tempatLahir,
+      Tanggal_Lahir: formattedTanggalLahir,
+      Tanggal: formattedTanggalLahir,
+      Jenis_Kelamin: resident.jenisKelamin,
+      Kelamin: resident.jenisKelamin,
+      Golongan_Darah: resident.golonganDarah || '-',
+      Alamat: fullAddress,
+      RT: resident.rt || '-',
+      RW: resident.rw || '-',
+      Kel_Desa: resident.kelDesa,
+      Desa: resident.kelDesa,
+      Kecamatan: resident.kecamatan,
+      Kabupaten: resident.kabupaten,
+      Agama: resident.agama || '-',
+      Status_Perkawinan: resident.statusPerkawinan || '-',
+      Status_Kawin: resident.statusPerkawinan || '-',
+      Pekerjaan: resident.pekerjaan || '-',
+      Kewarganegaraan: resident.kewarganegaraan,
+      Kepala_Desa: 'H. SUBANDI',
+
+      ...(validated.customData || {})
     };
 
     const sanitizedNomorSurat = validated.nomorSurat.replace(/[^a-zA-Z0-9_-]/g, '_');

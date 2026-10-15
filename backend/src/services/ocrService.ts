@@ -11,8 +11,14 @@ export const sendImageToOcrService = async (
   formData.append('file', blob, fileName);
 
   try {
+    const headers: Record<string, string> = {};
+    if (ENV.OCR_API_KEY) {
+      headers['X-API-Key'] = ENV.OCR_API_KEY;
+    }
+
     const response = await fetch(ENV.OCR_SERVICE_URL, {
       method: 'POST',
+      headers,
       body: formData
     });
 
@@ -21,26 +27,36 @@ export const sendImageToOcrService = async (
       throw new Error(`OCR Service Error (${response.status}): ${errorText}`);
     }
 
-    const data = (await response.json()) as Record<string, any>;
+    const data = (await response.json()) as {
+      fields?: Record<string, any>;
+      perlu_review?: boolean;
+      [key: string]: any;
+    };
+
+    const fields = data.fields || data;
 
     // Map response from OCR service to standardized OcrExtractedData
     // Adaptable to the python OCR output schema
     return {
-      nik: data.nik || '',
-      nama: data.nama || '',
-      tempatLahir: data.tempat_lahir || data.tempatLahir || '',
-      tanggalLahir: data.tanggal_lahir || data.tanggalLahir || '',
-      jenisKelamin: data.jenis_kelamin || data.jenisKelamin || '',
-      golonganDarah: data.golongan_darah || data.golonganDarah || '',
-      alamat: data.alamat || '',
-      rt: data.rt || '',
-      rw: data.rw || '',
-      kelDesa: data.kel_desa || data.kelDesa || 'Gempolkurung',
-      kecamatan: data.kecamatan || 'Menganti',
-      agama: data.agama || '',
-      statusPerkawinan: data.status_perkawinan || data.statusPerkawinan || '',
-      pekerjaan: data.pekerjaan || '',
-      kewarganegaraan: data.kewarganegaraan || 'WNI',
+      nik: fields.nik || null,
+      nama: fields.nama || null,
+      tempatLahir: fields.tempat_lahir || fields.tempatLahir || null,
+      tanggalLahir: fields.tanggal_lahir || fields.tanggalLahir || null,
+      jenisKelamin: fields.jenis_kelamin || fields.jenisKelamin || null,
+      golonganDarah: fields.gol_darah || fields.golongan_darah || fields.golonganDarah || null,
+      alamat: fields.alamat || null,
+      rt: fields.rt || null,
+      rw: fields.rw || null,
+      kelDesa: fields.kel_desa || fields.kelDesa || null,
+      kecamatan: fields.kecamatan || null,
+      kotaKab: fields.kota_kab || fields.kotaKab || null,
+      provinsi: fields.provinsi || null,
+      agama: fields.agama || null,
+      statusPerkawinan: fields.perkawinan || fields.status_perkawinan || fields.statusPerkawinan || null,
+      pekerjaan: fields.pekerjaan || null,
+      kewarganegaraan: fields.kewarganegaraan || 'WNI',
+      berlaku: fields.berlaku || null,
+      perluReview: data.perlu_review ?? true,
       rawResponse: data
     };
   } catch (error: unknown) {

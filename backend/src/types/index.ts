@@ -12,21 +12,25 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export interface OcrExtractedData {
-  nik?: string;
-  nama?: string;
-  tempatLahir?: string;
-  tanggalLahir?: string; // YYYY-MM-DD
-  jenisKelamin?: string; // LAKI-LAKI / PEREMPUAN
-  golonganDarah?: string;
-  alamat?: string;
-  rt?: string;
-  rw?: string;
-  kelDesa?: string;
-  kecamatan?: string;
-  agama?: string;
-  statusPerkawinan?: string;
-  pekerjaan?: string;
-  kewarganegaraan?: string;
+  nik?: string | null;
+  nama?: string | null;
+  tempatLahir?: string | null;
+  tanggalLahir?: string | null;
+  jenisKelamin?: string | null;
+  golonganDarah?: string | null;
+  alamat?: string | null;
+  rt?: string | null;
+  rw?: string | null;
+  kelDesa?: string | null;
+  kecamatan?: string | null;
+  kotaKab?: string | null;
+  provinsi?: string | null;
+  agama?: string | null;
+  statusPerkawinan?: string | null;
+  pekerjaan?: string | null;
+  kewarganegaraan?: string | null;
+  berlaku?: string | null;
+  perluReview?: boolean;
   rawResponse?: Record<string, unknown>;
 }
 

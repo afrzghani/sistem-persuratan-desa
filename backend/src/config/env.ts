@@ -9,5 +9,6 @@ export const ENV = {
   JWT_SECRET: process.env.JWT_SECRET || 'default_jwt_secret',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '1d',
   OCR_SERVICE_URL: process.env.OCR_SERVICE_URL || 'http://127.0.0.1:8000/ocr/ktp',
+  OCR_API_KEY: process.env.OCR_API_KEY || '',
   CORS_ORIGIN: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:3000', 'http://localhost:5173']
 };

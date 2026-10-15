@@ -39,6 +39,12 @@ async function main() {
       namaSurat: 'Surat Keterangan Domisili',
       templateFile: 'skd_template.docx',
       deskripsi: 'Surat keterangan tempat tinggal / domisili warga di Desa Gempolkurung.'
+    },
+    {
+      kodeSurat: 'SKBM',
+      namaSurat: 'Surat Keterangan Belum Menikah',
+      templateFile: 'C_SURAT KETERANGAN BELUM MENIKAH.docx',
+      deskripsi: 'Surat keterangan belum pernah menikah (jejaka / perawan) warga desa.'
     }
   ];
 
