@@ -2,12 +2,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import UploadKTP from "./pages/UploadKTP.jsx";
+import CreateLetter from "./pages/CreateLetter";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import Register from "./pages/Register.jsx";
 import KelolaAdmin from "./pages/KelolaAdmin.jsx";
+import DataWarga from "./pages/DataWarga.jsx";
 import AdminLayout from "./components/AdminHeader.jsx";
 import PengaturanDesa from "./pages/Pengaturan.jsx";
+import Riwayat from "./pages/Riwayat.jsx";
 
 function App() {
   return (
@@ -27,13 +28,11 @@ function App() {
           }
         >
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/upload" element={<UploadKTP />} />
+          <Route path="/upload" element={<CreateLetter />} />
+          <Route path="/warga" element={<DataWarga />} />
           <Route path="/kelola-admin" element={<KelolaAdmin />} />
-          <Route path="/kelola-admin/register" element={<Register />} />
-          <Route
-            path="/pengaturan-desa"
-            element={<PengaturanDesa />}
-          />
+          <Route path="/pengaturan-desa" element={<PengaturanDesa />}/>
+          <Route path="/riwayat" element={<Riwayat/>}/>
         </Route>
 
       </Routes>

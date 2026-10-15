@@ -1,6 +1,7 @@
+
 import AdminTableRow from "./AdminTableRow";
 
-function AdminTable({ admins, isLoading, onDeactivate }) {
+function AdminTable({ admins, isLoading, onDelete }) {
   return (
     <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       <div className="px-6 py-5 border-b border-slate-100">
@@ -25,20 +26,20 @@ function AdminTable({ admins, isLoading, onDeactivate }) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="text-left font-medium text-slate-500 px-6 py-4">
+              <tr className="bg-emerald-600 border-b border-slate-100">
+                <th className="text-left font-medium text-white px-6 py-4">
                   Nama
                 </th>
 
-                <th className="text-left font-medium text-slate-500 px-6 py-4">
+                <th className="text-left font-medium text-white px-6 py-4">
                   Email
                 </th>
 
-                <th className="text-left font-medium text-slate-500 px-6 py-4">
+                <th className="text-left font-medium text-white px-6 py-4">
                   Status
                 </th>
 
-                <th className="text-right font-medium text-slate-500 px-6 py-4">
+                <th className="text-right font-medium text-white px-6 py-4">
                   Aksi
                 </th>
               </tr>
@@ -49,7 +50,7 @@ function AdminTable({ admins, isLoading, onDeactivate }) {
                 <AdminTableRow
                   key={admin.id}
                   admin={admin}
-                  onDeactivate={onDeactivate}
+                  onDelete={onDelete}
                 />
               ))}
             </tbody>
