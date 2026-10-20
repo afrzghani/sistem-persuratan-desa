@@ -1,20 +1,17 @@
-function LetterDetailsForm({ formData, onChange, selectedType }) {
+
+function LetterDetailsForm({
+  formData,
+  onChange,
+  selectedTitle,
+}) {
   function handleChange(event) {
     const { name, value } = event.target;
     onChange(name, value);
   }
 
-  const letterTitles = {
-    domicile: "Surat Keterangan Domisili",
-    business: "Surat Keterangan Usaha",
-    introduction: "Surat Pengantar",
-    birth: "Surat Keterangan Kelahiran",
-  };
-console.log("selectedType:", selectedType);
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
       <div className="mb-6">
-
         <h2 className="mt-2 text-lg font-bold text-slate-800">
           Keperluan Surat
         </h2>
@@ -31,7 +28,7 @@ console.log("selectedType:", selectedType);
         </p>
 
         <p className="mt-1 font-semibold text-white">
-          {letterTitles[selectedType] || "Belum memilih jenis surat"}
+          {selectedTitle || "Belum memilih jenis surat"}
         </p>
       </div>
 

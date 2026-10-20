@@ -1,45 +1,88 @@
 
-const STORAGE_KEY = "sapaDesaWarga";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 // Mengambil semua data warga.
-export function getWarga() {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch (error) {
-    console.error("Gagal membaca data warga:", error);
-    return [];
+export async function getWarga() {
+  const response = await fetch(`${BASE_URL}/api/warga`);
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message || "Gagal mengambil data warga",
+    );
   }
+
+  return response.json();
 }
 
-// Menambahkan warga baru atau memperbarui warga berdasarkan NIK.
-export function simpanWarga(wargaBaru) {
-  const wargaTersimpan = getWarga();
+// Menambahkan data warga baru.
+export async function tambahWarga(dataWarga) {
+  const response = await fetch(`${BASE_URL}/api/warga`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dataWarga),
+  });
 
-  const index = wargaTersimpan.findIndex(
-    (warga) => warga.nik === wargaBaru.nik
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message || "Gagal menambahkan data warga",
+    );
+  }
+
+  return response.json();
+}
+
+// Memperbarui data warga berdasarkan NIK lama.
+export async function updateWarga(nik, dataWarga) {
+  const response = await fetch(
+    `${BASE_URL}/api/warga/${encodeURIComponent(nik)}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataWarga),
+    },
   );
 
-  let dataBaru;
-
-  if (index !== -1) {
-    dataBaru = [...wargaTersimpan];
-    dataBaru[index] = {
-      ...dataBaru[index],
-      ...wargaBaru,
-    };
-  } else {
-    dataBaru = [...wargaTersimpan, wargaBaru];
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message || "Gagal mengubah data warga",
+    );
   }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataBaru));
-  return dataBaru;
+  return response.json();
 }
 
-// Menghapus warga berdasarkan NIK.
-export function hapusWarga(nik) {
-  const dataBaru = getWarga().filter((warga) => warga.nik !== nik);
+// Menghapus data warga berdasarkan NIK.
+export async function hapusWarga(nik) {
+  const response = await fetch(
+    `${BASE_URL}/api/warga/${encodeURIComponent(nik)}`,
+    {
+      method: "DELETE",
+    },
+  );
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataBaru));
-  return dataBaru;
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message || "Gagal menghapus data warga",
+    );
+  }
+
+  // Mendukung respons backend tanpa isi (204 No Content).
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
+}
+
+// Kompatibilitas untuk komponen lama yang masih memakai simpanWarga.
+export async function simpanWarga(dataWarga) {
+  return tambahWarga(dataWarga);
 }

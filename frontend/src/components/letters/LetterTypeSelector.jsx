@@ -1,52 +1,47 @@
 
-import { useState } from "react";
-import { Search, X, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search, X, FileText, RefreshCw, AlertCircle } from "lucide-react";
 
-const letterTypes = [
-  {
-    id: "domicile",
-    title: "Surat Keterangan Domisili",
-    description: "Keterangan tempat tinggal penduduk.",
-  },
-  {
-    id: "business",
-    title: "Surat Keterangan Usaha",
-    description: "Keterangan kepemilikan usaha.",
-  },
-  {
-    id: "introduction",
-    title: "Surat Pengantar",
-    description: "Pengantar untuk keperluan administrasi.",
-  },
-  {
-    id: "birth",
-    title: "Surat Keterangan Kelahiran",
-    description: "Keterangan peristiwa kelahiran.",
-  },
-  {
-    id: "example-5",
-    title: "Jenis Surat 5",
-    description: "Nama surat menunggu konfirmasi desa.",
-  },
-  {
-    id: "example-6",
-    title: "Jenis Surat 6",
-    description: "Nama surat menunggu konfirmasi desa.",
-  },
-  {
-    id: "example-7",
-    title: "Jenis Surat 7",
-    description: "Nama surat menunggu konfirmasi desa.",
-  },
-  {
-    id: "example-8",
-    title: "Jenis Surat 8",
-    description: "Nama surat menunggu konfirmasi desa.",
-  },
-];
+import { getTemplates } from "../../services/templateService";
 
 function LetterTypeSelector({ selectedType, onSelect }) {
   const [search, setSearch] = useState("");
+  const [letterTypes, setLetterTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  async function muatTemplates() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await getTemplates();
+
+      if (!Array.isArray(data)) {
+        throw new Error("Format data template dari server tidak valid.");
+      }
+
+      setLetterTypes(
+        data.map((template) => ({
+          id: String(template.id ?? template._id ?? ""),
+          title:
+            template.namaTemplate ??
+            template.title ??
+            template.name ??
+            "Template tanpa nama",
+          description: template.deskripsi ?? template.description ?? "",
+        })).filter((template) => template.id)
+      );
+    } catch (err) {
+      setError(err.message || "Gagal memuat jenis surat dari server.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    muatTemplates();
+  }, []);
 
   const filteredLetterTypes = letterTypes.filter((letter) =>
     `${letter.title} ${letter.description}`
@@ -101,7 +96,7 @@ function LetterTypeSelector({ selectedType, onSelect }) {
           )}
         </div>
 
-        {search && (
+        {search && !loading && !error && (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-slate-500">
               Ditemukan {filteredLetterTypes.length} jenis surat
@@ -119,8 +114,39 @@ function LetterTypeSelector({ selectedType, onSelect }) {
         )}
       </div>
 
-      {/* Daftar jenis surat */}
-      {filteredLetterTypes.length > 0 ? (
+      {/* Loading */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <RefreshCw className="h-8 w-8 animate-spin text-emerald-600" />
+          <p className="mt-3 text-sm font-medium text-slate-700">
+            Memuat jenis surat...
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            Mohon tunggu sebentar.
+          </p>
+        </div>
+      ) : error ? (
+        /* Error */
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
+          <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
+
+          <p className="mt-3 text-sm font-semibold text-slate-800">
+            Gagal memuat jenis surat
+          </p>
+
+          <p className="mt-1 text-sm text-slate-500">{error}</p>
+
+          <button
+            type="button"
+            onClick={muatTemplates}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Coba lagi
+          </button>
+        </div>
+      ) : filteredLetterTypes.length > 0 ? (
+        /* Daftar jenis surat */
         <div
           className={`overflow-y-auto pr-2 ${
             isSingleResult ? "" : "max-h-[363px]"
@@ -195,25 +221,31 @@ function LetterTypeSelector({ selectedType, onSelect }) {
           </div>
         </div>
       ) : (
-        /* Hasil pencarian kosong */
+        /* Data kosong atau hasil pencarian kosong */
         <div className="rounded-xl border border-dashed border-slate-200 py-10 text-center">
           <Search className="mx-auto h-8 w-8 text-slate-300" />
 
           <p className="mt-3 text-sm font-medium text-slate-700">
-            Jenis surat tidak ditemukan
+            {letterTypes.length === 0
+              ? "Belum ada template surat"
+              : "Jenis surat tidak ditemukan"}
           </p>
 
           <p className="mt-1 text-sm text-slate-500">
-            Coba gunakan kata kunci lain.
+            {letterTypes.length === 0
+              ? "Template surat yang tersedia akan muncul di sini."
+              : "Coba gunakan kata kunci lain."}
           </p>
 
-          <button
-            type="button"
-            onClick={() => setSearch("")}
-            className="mt-3 text-sm font-medium text-emerald-600 hover:text-emerald-700"
-          >
-            Reset pencarian
-          </button>
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="mt-3 text-sm font-medium text-emerald-600 hover:text-emerald-700"
+            >
+              Reset pencarian
+            </button>
+          )}
         </div>
       )}
     </section>

@@ -1,91 +1,58 @@
 
-import { useMemo, useState } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useEffect, useMemo, useState } from "react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
-import TemplateSurat from '../components/riwayat/TemplateSurat';
-import TabelSurat from '../components/riwayat/arsip/TabelSurat';
-
-// Data dummy untuk melihat UI tanpa backend
-const DUMMY_SURAT = [
-  {
-    id: 1,
-    nomorSurat: '470/001/DS/2026',
-    jenisSurat: 'Surat Keterangan Domisili',
-    pemohon: 'Ahmad Fauzi',
-    status: 'Selesai',
-    tanggal: '2026-10-01',
-  },
-  {
-    id: 2,
-    nomorSurat: '470/002/DS/2026',
-    jenisSurat: 'Surat Keterangan Usaha',
-    pemohon: 'Siti Aminah',
-    status: 'Diproses',
-    tanggal: '2026-10-03',
-  },
-  {
-    id: 3,
-    nomorSurat: '470/003/DS/2026',
-    jenisSurat: 'Surat Pengantar SKCK',
-    pemohon: 'Budi Santoso',
-    status: 'Selesai',
-    tanggal: '2026-10-04',
-  },
-  {
-    id: 4,
-    nomorSurat: '470/004/DS/2026',
-    jenisSurat: 'Surat Keterangan Tidak Mampu',
-    pemohon: 'Dewi Lestari',
-    status: 'Diproses',
-    tanggal: '2026-10-05',
-  },
-  {
-    id: 5,
-    nomorSurat: '470/005/DS/2026',
-    jenisSurat: 'Surat Keterangan Kelahiran',
-    pemohon: 'Rizky Pratama',
-    status: 'Selesai',
-    tanggal: '2026-10-06',
-  },
-  {
-    id: 6,
-    nomorSurat: '470/006/DS/2026',
-    jenisSurat: 'Surat Keterangan Kematian',
-    pemohon: 'Nur Hidayah',
-    status: 'Diproses',
-    tanggal: '2026-10-07',
-  },
-];
+import TemplateSurat from "../components/riwayat/TemplateSurat";
+import TabelSurat from "../components/riwayat/arsip/TabelSurat";
+import { getRiwayatSurat } from "../services/templateService";
 
 function formatTanggal(tanggal) {
-  if (!tanggal) return '-';
+  if (!tanggal) return "-";
 
   const date = new Date(tanggal);
 
-  if (Number.isNaN(date.getTime())) return '-';
+  if (Number.isNaN(date.getTime())) return "-";
 
-  return date.toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
   });
 }
 
 function Riwayat() {
-  const [surat, setSurat] = useState(DUMMY_SURAT);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [kataKunci, setKataKunci] = useState('');
-  const [filterStatus, setFilterStatus] = useState('Semua');
+  const [surat, setSurat] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [kataKunci, setKataKunci] = useState("");
+  const [filterStatus, setFilterStatus] = useState("Semua");
 
-  // Simulasi memuat ulang data dummy
-  function muatRiwayatSurat() {
-    setLoading(true);
-    setError('');
+  async function muatRiwayatSurat() {
+    try {
+      setLoading(true);
+      setError("");
 
-    setSurat([...DUMMY_SURAT]);
-    setLoading(false);
+      const data = await getRiwayatSurat();
+
+      if (!Array.isArray(data)) {
+        throw new Error(
+          "Format data riwayat surat dari server tidak valid.",
+        );
+      }
+
+      setSurat(data);
+    } catch (err) {
+      setError(
+        err.message || "Gagal memuat riwayat surat dari server.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
+
+  useEffect(() => {
+    muatRiwayatSurat();
+  }, []);
 
   const suratDitampilkan = useMemo(() => {
     const kata = kataKunci.trim().toLowerCase();
@@ -96,11 +63,11 @@ function Riwayat() {
         item.jenisSurat,
         item.pemohon,
       ].some((nilai) =>
-        String(nilai ?? '').toLowerCase().includes(kata)
+        String(nilai ?? "").toLowerCase().includes(kata),
       );
 
       const cocokStatus =
-        filterStatus === 'Semua' ||
+        filterStatus === "Semua" ||
         item.status === filterStatus;
 
       return cocokKataKunci && cocokStatus;
@@ -108,16 +75,18 @@ function Riwayat() {
   }, [surat, kataKunci, filterStatus]);
 
   function resetFilter() {
-    setKataKunci('');
-    setFilterStatus('Semua');
+    setKataKunci("");
+    setFilterStatus("Semua");
   }
 
   function handleLihatSurat(item) {
+    // Sementara tampilkan detail sederhana.
+    // Nanti bisa dihubungkan ke modal detail surat.
     window.alert(
       `Nomor Surat: ${item.nomorSurat}\n` +
         `Jenis Surat: ${item.jenisSurat}\n` +
         `Pemohon: ${item.pemohon}\n` +
-        `Status: ${item.status}`
+        `Status: ${item.status}`,
     );
   }
 
@@ -125,9 +94,11 @@ function Riwayat() {
     return (
       <div className="flex min-h-[40vh] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-8">
         <RefreshCw className="h-8 w-8 animate-spin text-emerald-600" />
+
         <p className="mt-4 font-medium text-slate-700">
           Memuat riwayat surat...
         </p>
+
         <p className="mt-1 text-sm text-slate-500">
           Mohon tunggu sebentar.
         </p>
@@ -171,6 +142,7 @@ function Riwayat() {
           <h2 className="text-lg font-semibold text-slate-800">
             Arsip Surat
           </h2>
+
           <p className="mt-2 text-sm text-slate-500">
             Daftar surat yang tersimpan di server.
           </p>
@@ -201,11 +173,6 @@ function Riwayat() {
           suratDitampilkan={suratDitampilkan}
           onLihat={handleLihatSurat}
           onResetFilter={resetFilter}
-          onPulihkanData={() => {
-            window.alert(
-              'Pemulihan data contoh belum dihubungkan ke backend.'
-            );
-          }}
           formatTanggal={formatTanggal}
         />
       </section>

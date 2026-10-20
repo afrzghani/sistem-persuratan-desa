@@ -1,62 +1,63 @@
-import { useState } from "react";
+
+import { useCallback, useEffect, useState } from "react";
 import AdminStats from "../components/kelola_admin/AdminStats";
 import AdminTable from "../components/kelola_admin/AdminTable";
 import FormTambahAdmin from "../components/kelola_admin/FormTambahAdmin";
-
-const dummyAdmins = [
-  {
-    id: 1,
-    name: "Andi Saputra",
-    email: "andi@desa.go.id",
-    status: "Aktif",
-  },
-  {
-    id: 2,
-    name: "Siti Rahmawati",
-    email: "siti@desa.go.id",
-    status: "Aktif",
-  },
-  {
-    id: 3,
-    name: "Budi Santoso",
-    email: "budi@desa.go.id",
-    status: "Nonaktif",
-  },
-  {
-    id: 4,
-    name: "Dewi Lestari",
-    email: "dewi@desa.go.id",
-    status: "Aktif",
-  },
-  {
-    id: 5,
-    name: "Rizky Pratama",
-    email: "rizky@desa.go.id",
-    status: "Nonaktif",
-  },
-];
+import {
+  getAdmins,
+  deactivateAdmin,
+} from "../services/adminService";
 
 function KelolaAdmin() {
-  const [admins, setAdmins] = useState(dummyAdmins);
-  const [isLoading] = useState(false);
+  const [admins, setAdmins] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [showFormTambah, setShowFormTambah] = useState(false);
 
-  function handleDelete(id) {
+  const muatAdmins = useCallback(async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const data = await getAdmins();
+
+      if (!Array.isArray(data)) {
+        throw new Error("Format data admin dari server tidak valid.");
+      }
+
+      setAdmins(data);
+    } catch (err) {
+      setError(err.message || "Gagal mengambil data admin.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    muatAdmins();
+  }, [muatAdmins]);
+
+  async function handleDelete(id) {
     const confirmed = window.confirm(
-      "Apakah kamu yakin ingin menghapus admin ini secara permanen?",
+      "Apakah kamu yakin ingin menonaktifkan admin ini?",
     );
 
     if (!confirmed) return;
 
-    setAdmins((dataSebelumnya) =>
-      dataSebelumnya.filter((admin) => admin.id !== id),
-    );
+    setError("");
+
+    try {
+      await deactivateAdmin(id);
+      await muatAdmins();
+    } catch (err) {
+      setError(err.message || "Gagal menonaktifkan admin.");
+    }
   }
 
-  function handleTambahBerhasil() {
+  async function handleTambahBerhasil() {
     setShowFormTambah(false);
     setError("");
+    await muatAdmins();
   }
 
   return (
@@ -65,14 +66,17 @@ function KelolaAdmin() {
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
-              <div className="mb-1 flex items-center gap-2 text-sm">
-                <span className="text-slate-500">Dashboard</span>
-                <span className="text-slate-500">/</span>
-                <span className="font-medium text-emerald-600">
-                  Kelola Admin
-                </span>
-              </div>
-            <h1 className="text-2xl font-bold text-slate-800">Kelola Admin</h1>
+            <div className="mb-1 flex items-center gap-2 text-sm">
+              <span className="text-slate-500">Dashboard</span>
+              <span className="text-slate-500">/</span>
+              <span className="font-medium text-emerald-600">
+                Kelola Admin
+              </span>
+            </div>
+
+            <h1 className="text-2xl font-bold text-slate-800">
+              Kelola Admin
+            </h1>
 
             <p className="mt-1 text-sm text-slate-500">
               Kelola akun yang memiliki akses ke sistem administrasi desa.

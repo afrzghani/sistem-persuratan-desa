@@ -70,19 +70,35 @@ export async function deleteTemplate(id) {
 }
 
 
-/* ================================
-   RIWAYAT SURAT
-================================ */
+// ================================
+// RIWAYAT SURAT
+// ================================
 
 // Ambil daftar riwayat surat dari backend
 export async function getRiwayatSurat() {
   const response = await fetch(`${API_URL}/api/riwayat-surat`);
 
   if (!response.ok) {
-    throw new Error("Gagal mengambil data riwayat surat dari server.");
+    let pesanError = "Gagal mengambil data riwayat surat dari server.";
+
+    try {
+      const errorData = await response.json();
+      pesanError = errorData.message || pesanError;
+    } catch {
+      // Gunakan pesan default jika respons error bukan JSON.
+    }
+
+    throw new Error(pesanError);
   }
 
   const result = await response.json();
 
-  return Array.isArray(result) ? result : result.data;
+  // Mendukung respons berupa array langsung atau objek { data: [...] }.
+  const data = Array.isArray(result) ? result : result?.data;
+
+  if (!Array.isArray(data)) {
+    throw new Error("Format data riwayat surat dari server tidak valid.");
+  }
+
+  return data;
 }

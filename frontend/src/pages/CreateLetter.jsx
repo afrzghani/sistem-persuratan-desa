@@ -7,8 +7,6 @@ import KTPUploader from "../components/letters/KTPUploader";
 import ApplicantForm from "../components/letters/ApplicantForm";
 import LetterDetailsForm from "../components/letters/LetterDetailsForm";
 import LetterPreview from "../components/letters/LetterPreview";
-import { simpanSurat } from "../services/suratService";
-import { simpanWarga } from "../services/wargaService";
 
 const initialFormData = {
   nik: "",
@@ -27,26 +25,16 @@ const initialFormData = {
 
 const steps = ["Pilih jenis surat", "Unggah KTP", "Periksa data"];
 
-const letterTitles = {
-  domicile: "Surat Keterangan Domisili",
-  business: "Surat Keterangan Usaha",
-  introduction: "Surat Pengantar",
-  birth: "Surat Keterangan Kelahiran",
-  "example-5": "Jenis Surat 5",
-  "example-6": "Jenis Surat 6",
-  "example-7": "Jenis Surat 7",
-  "example-8": "Jenis Surat 8",
-};
-
 function CreateLetter() {
   const [step, setStep] = useState(() => {
     const savedStep = Number(sessionStorage.getItem("createLetterStep"));
     return [1, 2, 3].includes(savedStep) ? savedStep : 1;
   });
 
-  const [letterType, setLetterType] = useState(
-    () => sessionStorage.getItem("createLetterType") || ""
-  );
+  const [letterType, setLetterType] = useState(() => {
+    sessionStorage.removeItem("createLetterType");
+    return "";
+  });
 
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
@@ -60,7 +48,11 @@ function CreateLetter() {
   }, [step]);
 
   useEffect(() => {
-    sessionStorage.setItem("createLetterType", letterType);
+    if (letterType) {
+      sessionStorage.setItem("createLetterType", letterType);
+    } else {
+      sessionStorage.removeItem("createLetterType");
+    }
   }, [letterType]);
 
   useEffect(() => {
@@ -131,17 +123,7 @@ function CreateLetter() {
     }
 
     setError("");
-    setIsProcessing(true);
-
-    try {
-      // Simulasi sementara, belum memanggil API OCR.
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setStep(3);
-    } catch {
-      setError("Terjadi kesalahan saat memproses KTP.");
-    } finally {
-      setIsProcessing(false);
-    }
+    setStep(3);
   }
 
   function handleGenerate() {
@@ -175,52 +157,11 @@ function CreateLetter() {
     setShowPreview(true);
   }
 
-  
-function handleCompleteLetter() {
-  const dataWarga = {
-    nik: formData.nik.trim(),
-    nama: formData.fullName.trim(),
-    tempatLahir: formData.birthPlace,
-    tanggalLahir: formData.birthDate,
-    jenisKelamin: formData.gender,
-    agama: formData.religion,
-    statusPerkawinan: formData.maritalStatus,
-    pekerjaan: formData.occupation,
-    alamat: formData.address,
-    rt: formData.rt,
-    rw: formData.rw,
-  };
-
-  const suratBaru = {
-    id: crypto.randomUUID(),
-    nomorSurat: `DRAFT-${Date.now()}`,
-    jenisSurat: letterTitles[letterType] || "Surat Keterangan",
-    pemohon: formData.fullName,
-    tanggal: new Date().toISOString(),
-    status: "Selesai",
-    dataPemohon: { ...formData },
-    keperluan: formData.purpose,
-  };
-
-  try {
-    // Simpan atau perbarui data warga berdasarkan NIK.
-    simpanWarga(dataWarga);
-
-    // Simpan riwayat surat seperti sebelumnya.
-    simpanSurat(suratBaru);
-
-    sessionStorage.removeItem("createLetterStep");
-    sessionStorage.removeItem("createLetterType");
-
-    window.location.href = "/riwayat";
-  } catch (saveError) {
-    console.error("Gagal menyimpan data warga atau surat:", saveError);
+  function handleCompleteLetter() {
     window.alert(
-      "Data warga atau surat gagal disimpan. Silakan coba kembali."
+      "Pembuatan surat belum tersedia. Silakan tunggu integrasi dengan backend."
     );
   }
-}
-
 
   if (showPreview) {
     return (
@@ -325,6 +266,11 @@ function handleCompleteLetter() {
               <button
                 type="button"
                 onClick={() => {
+                  if (!letterType) {
+                    setError("Silakan pilih jenis surat terlebih dahulu.");
+                    return;
+                  }
+
                   setError("");
                   setStep(2);
                 }}
@@ -355,17 +301,6 @@ function handleCompleteLetter() {
 
         {step === 3 && (
           <>
-            <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
-              <p className="text-sm font-semibold text-amber-800">
-                Mode pengembangan
-              </p>
-
-              <p className="mt-1 text-sm leading-6 text-amber-700">
-                OCR belum terhubung. Isi data pemohon secara manual untuk
-                menguji tampilan formulir.
-              </p>
-            </div>
-
             <div className="space-y-6">
               <ApplicantForm
                 formData={formData}

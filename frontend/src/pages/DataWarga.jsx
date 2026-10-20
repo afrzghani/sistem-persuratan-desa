@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 
 import {
   getWarga,
-  simpanWarga,
+  tambahWarga,
+  updateWarga,
   hapusWarga,
 } from "../services/wargaService";
 
@@ -39,10 +40,25 @@ function DataWarga() {
   const [formTerbuka, setFormTerbuka] = useState(false);
   const [wargaDipilih, setWargaDipilih] = useState(null);
   const [error, setError] = useState("");
+  const [sedangMemuat, setSedangMemuat] = useState(true);
 
-  // Memuat data warga saat halaman dibuka.
+  // Memuat data warga dari backend.
+  async function muatWarga() {
+    setSedangMemuat(true);
+
+    try {
+      const data = await getWarga();
+      setWarga(data);
+      setError("");
+    } catch (error) {
+      setError(error.message || "Gagal mengambil data warga");
+    } finally {
+      setSedangMemuat(false);
+    }
+  }
+
   useEffect(() => {
-    setWarga(getWarga());
+    muatWarga();
   }, []);
 
   // Filter warga berdasarkan NIK atau nama.
@@ -94,8 +110,8 @@ function DataWarga() {
     }
   }
 
-  // Validasi dan simpan data warga.
-  function handleSimpan(event) {
+  // Validasi dan simpan data warga melalui API.
+  async function handleSimpan(event) {
     event.preventDefault();
     setError("");
 
@@ -120,7 +136,7 @@ function DataWarga() {
     const nikDuplikat = warga.some(
       (item) =>
         item.nik === nik &&
-        (!sedangEdit || item.nik !== nikAwal)
+        (!sedangEdit || item.nik !== nikAwal),
     );
 
     if (nikDuplikat) {
@@ -128,31 +144,47 @@ function DataWarga() {
       return;
     }
 
-    const wargaTersimpan = simpanWarga({
+    const dataWarga = {
       ...form,
       nik,
       nama,
-    });
+    };
 
-    setWarga(wargaTersimpan);
-    tutupForm();
+    try {
+      if (sedangEdit) {
+        await updateWarga(nikAwal, dataWarga);
+      } else {
+        await tambahWarga(dataWarga);
+      }
+
+      await muatWarga();
+      tutupForm();
+    } catch (error) {
+      setError(error.message || "Gagal menyimpan data warga");
+    }
   }
 
   // Menghapus warga setelah konfirmasi.
-  function handleHapus(nik) {
+  async function handleHapus(nik) {
     const dikonfirmasi = window.confirm(
-      "Apakah kamu yakin ingin menghapus data warga ini?"
+      "Apakah kamu yakin ingin menghapus data warga ini?",
     );
 
     if (!dikonfirmasi) return;
 
-    const wargaTerhapus = hapusWarga(nik);
+    setError("");
 
-    setWarga(wargaTerhapus);
+    try {
+      await hapusWarga(nik);
 
-    setWargaDipilih((sebelumnya) =>
-      sebelumnya?.nik === nik ? null : sebelumnya
-    );
+      setWargaDipilih((sebelumnya) =>
+        sebelumnya?.nik === nik ? null : sebelumnya,
+      );
+
+      await muatWarga();
+    } catch (error) {
+      setError(error.message || "Gagal menghapus data warga");
+    }
   }
 
   // Memformat tanggal untuk modal detail.
@@ -193,6 +225,21 @@ function DataWarga() {
             Kelola data identitas warga desa.
           </p>
         </div>
+
+        {error && !formTerbuka && (
+          <p
+            role="alert"
+            className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+          >
+            {error}
+          </p>
+        )}
+
+        {sedangMemuat && (
+          <p className="mb-4 text-sm text-slate-500">
+            Memuat data warga...
+          </p>
+        )}
 
         {/* Tabel dan pencarian warga */}
         <WargaTable
