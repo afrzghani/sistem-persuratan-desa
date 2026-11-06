@@ -13,6 +13,7 @@ function WargaDetailModal({ warga, tutupDetail, formatTanggal }) {
       nilai: formatTanggal(warga.tanggalLahir),
     },
     { label: "Jenis Kelamin", nilai: warga.jenisKelamin },
+    { label: "Golongan Darah", nilai: warga.golonganDarah },
     { label: "Agama", nilai: warga.agama },
     { label: "Status Perkawinan", nilai: warga.statusPerkawinan },
     { label: "Pekerjaan", nilai: warga.pekerjaan },

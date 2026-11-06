@@ -1,16 +1,12 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import {
-  getWarga,
-  tambahWarga,
-  updateWarga,
-  hapusWarga,
-} from "../services/wargaService";
+import { getWarga, tambahWarga, hapusWarga } from "../services/wargaService";
 
 import WargaTable from "../components/warga/WargaTable";
 import WargaFormModal from "../components/warga/WargaFormModal";
 import WargaDetailModal from "../components/warga/WargaDetailModal";
+import ModalPemberitahuan from "../components/ModalPemberitahuan";
 
 const formAwal = {
   nik: "",
@@ -18,6 +14,7 @@ const formAwal = {
   tempatLahir: "",
   tanggalLahir: "",
   jenisKelamin: "",
+  golonganDarah: "",
   agama: "",
   statusPerkawinan: "",
   pekerjaan: "",
@@ -29,36 +26,74 @@ const formAwal = {
 const inputClass =
   "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100";
 
+function toDateInput(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value).slice(0, 10);
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+async function ambilDataWarga() {
+  const data = await getWarga({ limit: 1000 });
+
+  return data?.residents ?? [];
+}
+
 function DataWarga() {
   const [warga, setWarga] = useState([]);
   const [pencarian, setPencarian] = useState("");
 
   const [form, setForm] = useState({ ...formAwal });
-  const [nikAwal, setNikAwal] = useState("");
   const [sedangEdit, setSedangEdit] = useState(false);
 
   const [formTerbuka, setFormTerbuka] = useState(false);
   const [wargaDipilih, setWargaDipilih] = useState(null);
   const [error, setError] = useState("");
   const [sedangMemuat, setSedangMemuat] = useState(true);
+  const [nikDihapus, setNikDihapus] = useState("");
+  const [notifikasi, setNotifikasi] = useState(null);
 
-  // Memuat data warga dari backend.
-  async function muatWarga() {
-    setSedangMemuat(true);
-
+  // Memuat data warga dari backend (dipakai tombol/aksi manual).
+  const muatWarga = useCallback(async () => {
     try {
-      const data = await getWarga();
-      setWarga(data);
+      setWarga(await ambilDataWarga());
       setError("");
     } catch (error) {
       setError(error.message || "Gagal mengambil data warga");
     } finally {
       setSedangMemuat(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    muatWarga();
+    let aktif = true;
+
+    ambilDataWarga()
+      .then((data) => {
+        if (!aktif) return;
+
+        setWarga(data);
+        setError("");
+      })
+      .catch((error) => {
+        if (aktif) {
+          setError(error.message || "Gagal mengambil data warga");
+        }
+      })
+      .finally(() => {
+        if (aktif) {
+          setSedangMemuat(false);
+        }
+      });
+
+    return () => {
+      aktif = false;
+    };
   }, []);
 
   // Filter warga berdasarkan NIK atau nama.
@@ -75,12 +110,14 @@ function DataWarga() {
     setError("");
 
     if (wargaTerpilih) {
-      setForm({ ...formAwal, ...wargaTerpilih });
-      setNikAwal(wargaTerpilih.nik);
+      setForm({
+        ...formAwal,
+        ...wargaTerpilih,
+        tanggalLahir: toDateInput(wargaTerpilih.tanggalLahir),
+      });
       setSedangEdit(true);
     } else {
       setForm({ ...formAwal });
-      setNikAwal("");
       setSedangEdit(false);
     }
 
@@ -91,7 +128,6 @@ function DataWarga() {
   function tutupForm() {
     setFormTerbuka(false);
     setForm({ ...formAwal });
-    setNikAwal("");
     setSedangEdit(false);
     setError("");
   }
@@ -128,15 +164,30 @@ function DataWarga() {
       return;
     }
 
-    if (sedangEdit && nik !== nikAwal) {
-      setError("NIK tidak dapat diubah saat mengedit data.");
+    if (!String(form.tempatLahir ?? "").trim()) {
+      setError("Tempat lahir wajib diisi.");
+      return;
+    }
+
+    if (!form.tanggalLahir) {
+      setError("Tanggal lahir wajib diisi.");
+      return;
+    }
+
+    if (!form.jenisKelamin) {
+      setError("Jenis kelamin wajib diisi.");
+      return;
+    }
+
+    if (!String(form.alamat ?? "").trim()) {
+      setError("Alamat wajib diisi.");
       return;
     }
 
     const nikDuplikat = warga.some(
       (item) =>
         item.nik === nik &&
-        (!sedangEdit || item.nik !== nikAwal),
+        (!sedangEdit || item.nik !== nik),
     );
 
     if (nikDuplikat) {
@@ -151,12 +202,7 @@ function DataWarga() {
     };
 
     try {
-      if (sedangEdit) {
-        await updateWarga(nikAwal, dataWarga);
-      } else {
-        await tambahWarga(dataWarga);
-      }
-
+      await tambahWarga(dataWarga);
       await muatWarga();
       tutupForm();
     } catch (error) {
@@ -164,26 +210,32 @@ function DataWarga() {
     }
   }
 
-  // Menghapus warga setelah konfirmasi.
-  async function handleHapus(nik) {
-    const dikonfirmasi = window.confirm(
-      "Apakah kamu yakin ingin menghapus data warga ini?",
+  async function handleHapusWarga(item) {
+    const disetujui = window.confirm(
+      `Hapus data warga ${item.nama} (${item.nik}) dari daftar aktif? Riwayat surat yang pernah diterbitkan tetap tersimpan di arsip.`,
     );
 
-    if (!dikonfirmasi) return;
-
-    setError("");
+    if (!disetujui) return;
 
     try {
-      await hapusWarga(nik);
+      setNikDihapus(item.nik);
+      setError("");
+      await hapusWarga(item.nik);
 
-      setWargaDipilih((sebelumnya) =>
-        sebelumnya?.nik === nik ? null : sebelumnya,
-      );
+      if (wargaDipilih?.nik === item.nik) {
+        setWargaDipilih(null);
+      }
 
       await muatWarga();
     } catch (error) {
-      setError(error.message || "Gagal menghapus data warga");
+      setNotifikasi({
+        judul: "Data warga tidak dapat dihapus",
+        pesan:
+          error.message ||
+          "Terjadi kesalahan saat menghapus data warga. Silakan coba lagi.",
+      });
+    } finally {
+      setNikDihapus("");
     }
   }
 
@@ -191,7 +243,9 @@ function DataWarga() {
   function formatTanggal(tanggal) {
     if (!tanggal) return "-";
 
-    const tanggalValid = new Date(`${tanggal}T00:00:00`);
+    const tanggalValid = String(tanggal).includes("T")
+      ? new Date(tanggal)
+      : new Date(`${tanggal}T00:00:00`);
 
     if (Number.isNaN(tanggalValid.getTime())) {
       return tanggal;
@@ -249,7 +303,8 @@ function DataWarga() {
           setPencarian={setPencarian}
           bukaForm={bukaForm}
           bukaDetail={(item) => setWargaDipilih(item)}
-          handleHapus={handleHapus}
+          hapusWarga={handleHapusWarga}
+          nikDihapus={nikDihapus}
         />
 
         {/* Modal tambah dan edit warga */}
@@ -273,6 +328,13 @@ function DataWarga() {
             formatTanggal={formatTanggal}
           />
         )}
+
+        <ModalPemberitahuan
+          terbuka={Boolean(notifikasi)}
+          judul={notifikasi?.judul || ""}
+          pesan={notifikasi?.pesan || ""}
+          onTutup={() => setNotifikasi(null)}
+        />
       </div>
     </div>
   );

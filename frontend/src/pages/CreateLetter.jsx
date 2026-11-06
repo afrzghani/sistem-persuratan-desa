@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 
 import LetterTypeSelector from "../components/letters/LetterTypeSelector";
@@ -7,6 +8,18 @@ import KTPUploader from "../components/letters/KTPUploader";
 import ApplicantForm from "../components/letters/ApplicantForm";
 import LetterDetailsForm from "../components/letters/LetterDetailsForm";
 import LetterPreview from "../components/letters/LetterPreview";
+import ModalPemberitahuan from "../components/ModalPemberitahuan";
+
+import { extractKtp } from "../services/ocrService";
+import {
+  getDownloadUrl,
+  getDraftSurat,
+  hapusDraftSurat,
+  issueLetter,
+  simpanDraftSurat,
+  updateLetterStatus,
+} from "../services/letterService";
+import { tambahWarga } from "../services/wargaService";
 
 const initialFormData = {
   nik: "",
@@ -14,6 +27,7 @@ const initialFormData = {
   birthPlace: "",
   birthDate: "",
   gender: "",
+  bloodType: "",
   religion: "",
   maritalStatus: "",
   occupation: "",
@@ -21,39 +35,122 @@ const initialFormData = {
   rt: "",
   rw: "",
   purpose: "",
+  nomorSurat: "",
+  keterangan: "",
 };
 
 const steps = ["Pilih jenis surat", "Unggah KTP", "Periksa data"];
 
+function toDateInput(value) {
+  if (!value) return "";
+
+  const text = String(value).trim();
+  const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+  if (iso) {
+    return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  }
+
+  const dmy = text.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+
+  if (dmy) {
+    return `${dmy[3]}-${String(dmy[2]).padStart(2, "0")}-${String(
+      dmy[1]
+    ).padStart(2, "0")}`;
+  }
+
+  const date = new Date(text);
+
+  if (!Number.isNaN(date.getTime())) {
+    return date.toISOString().slice(0, 10);
+  }
+
+  return "";
+}
+
+function normalizeGender(value) {
+  const text = String(value ?? "").toLowerCase();
+
+  if (text.includes("laki") || text.includes("pria") || text.includes("male")) {
+    return "Laki-laki";
+  }
+
+  if (
+    text.includes("perempuan") ||
+    text.includes("wanita") ||
+    text.includes("female")
+  ) {
+    return "Perempuan";
+  }
+
+  return value || "";
+}
+
+function mapProfile(profile = {}) {
+  return {
+    nik: profile.nik ?? "",
+    fullName: profile.nama ?? "",
+    birthPlace: profile.tempatLahir ?? "",
+    birthDate: toDateInput(profile.tanggalLahir),
+    gender: normalizeGender(profile.jenisKelamin),
+    bloodType: profile.golonganDarah ?? "",
+    religion: profile.agama ?? "",
+    maritalStatus: profile.statusPerkawinan ?? "",
+    occupation: profile.pekerjaan ?? "",
+    address: profile.alamat ?? "",
+    rt: profile.rt ?? "",
+    rw: profile.rw ?? "",
+  };
+}
+
+function mapTemplateDraft(template) {
+  if (!template) return null;
+
+  return {
+    id: String(template.id ?? ""),
+    kodeSurat: template.kodeSurat ?? "",
+    title: template.namaSurat ?? "Template tanpa nama",
+    description: template.deskripsi ?? "",
+  };
+}
+
+function toResidentPayload(formData) {
+  return {
+    nik: formData.nik,
+    nama: formData.fullName,
+    tempatLahir: formData.birthPlace,
+    tanggalLahir: formData.birthDate,
+    jenisKelamin: formData.gender,
+    golonganDarah: formData.bloodType || undefined,
+    alamat: formData.address,
+    rt: formData.rt,
+    rw: formData.rw,
+    agama: formData.religion,
+    statusPerkawinan: formData.maritalStatus,
+    pekerjaan: formData.occupation,
+    kelDesa: "Gempolkurung",
+    kecamatan: "Menganti",
+    kabupaten: "Gresik",
+    kewarganegaraan: "WNI",
+  };
+}
+
 function CreateLetter() {
-  const [step, setStep] = useState(() => {
-    const savedStep = Number(sessionStorage.getItem("createLetterStep"));
-    return [1, 2, 3].includes(savedStep) ? savedStep : 1;
-  });
+  const navigate = useNavigate();
 
-  const [letterType, setLetterType] = useState(() => {
-    sessionStorage.removeItem("createLetterType");
-    return "";
-  });
+  const [step, setStep] = useState(1);
 
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
+  const [generatedLetter, setGeneratedLetter] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
-
-  useEffect(() => {
-    sessionStorage.setItem("createLetterStep", String(step));
-  }, [step]);
-
-  useEffect(() => {
-    if (letterType) {
-      sessionStorage.setItem("createLetterType", letterType);
-    } else {
-      sessionStorage.removeItem("createLetterType");
-    }
-  }, [letterType]);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [notifikasi, setNotifikasi] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -62,6 +159,52 @@ function CreateLetter() {
       }
     };
   }, [preview]);
+
+  // Lanjutkan draft yang belum selesai saat halaman dibuka kembali.
+  useEffect(() => {
+    let aktif = true;
+
+    getDraftSurat()
+      .then((draft) => {
+        if (!aktif || !draft) return;
+
+        setSelectedTemplate(mapTemplateDraft(draft.template));
+        setFormData({ ...initialFormData, ...(draft.formData || {}) });
+        setStep(Math.min(Math.max(Number(draft.step) || 1, 1), 3));
+
+        if (draft.issuedLetter) {
+          setGeneratedLetter({
+            issuedLetter: draft.issuedLetter,
+            downloadUrl: getDownloadUrl(draft.issuedLetter.generatedFile),
+          });
+          setShowPreview(true);
+        }
+      })
+      .catch(() => {
+        // Draft bersifat opsional; abaikan bila gagal dimuat.
+      });
+
+    return () => {
+      aktif = false;
+    };
+  }, []);
+
+  // Simpan draft otomatis saat sudah masuk tahap 2 ke atas.
+  useEffect(() => {
+    if (step < 2 || !selectedTemplate?.id || showPreview || generatedLetter) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      simpanDraftSurat({
+        templateId: Number(selectedTemplate.id),
+        step,
+        formData,
+      }).catch(() => undefined);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData, step, selectedTemplate, showPreview, generatedLetter]);
 
   async function handleFile(selectedFile) {
     setError("");
@@ -123,10 +266,34 @@ function CreateLetter() {
     }
 
     setError("");
+    setIsProcessing(true);
+
+    try {
+      const data = await extractKtp(file);
+      const profile = data?.existingProfile || data?.extracted || {};
+
+      setFormData((previousData) => ({
+        ...previousData,
+        ...mapProfile(profile),
+      }));
+
+      setStep(3);
+    } catch (err) {
+      setError(
+        err.message ||
+          "OCR KTP gagal diproses. Kamu bisa mengisi data secara manual."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  }
+
+  function handleSkipOcr() {
+    setError("");
     setStep(3);
   }
 
-  function handleGenerate() {
+  async function handleGenerate() {
     const requiredFields = [
       ["nik", "NIK"],
       ["fullName", "Nama lengkap"],
@@ -137,6 +304,7 @@ function CreateLetter() {
       ["maritalStatus", "Status perkawinan"],
       ["occupation", "Pekerjaan"],
       ["address", "Alamat lengkap"],
+      ["nomorSurat", "Nomor surat"],
       ["purpose", "Keperluan surat"],
     ];
 
@@ -145,36 +313,116 @@ function CreateLetter() {
     );
 
     if (missingField) {
-      window.alert(`Mohon lengkapi ${missingField[1]}.`);
+      setError(`Mohon lengkapi ${missingField[1]}.`);
       return;
     }
 
     if (!/^\d{16}$/.test(formData.nik)) {
-      window.alert("NIK harus terdiri dari 16 digit angka.");
+      setError("NIK harus terdiri dari 16 digit angka.");
       return;
     }
 
-    setShowPreview(true);
+    if (!selectedTemplate?.id) {
+      setError("Jenis surat belum dipilih.");
+      return;
+    }
+
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      await tambahWarga(toResidentPayload(formData));
+
+      const payload = {
+        residentNik: formData.nik,
+        templateId: Number(selectedTemplate.id),
+        nomorSurat: formData.nomorSurat.trim(),
+        keperluan: formData.purpose.trim(),
+      };
+
+      if (formData.keterangan.trim()) {
+        payload.keterangan = formData.keterangan.trim();
+      }
+
+      await simpanDraftSurat({
+        templateId: Number(selectedTemplate.id),
+        step: 3,
+        formData,
+      });
+
+      const result = await issueLetter(payload);
+
+      setGeneratedLetter(result);
+      setShowPreview(true);
+    } catch (err) {
+      setNotifikasi({
+        judul: "Surat gagal dibuat",
+        pesan: err.message || "Gagal membuat surat. Silakan coba lagi.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
-  function handleCompleteLetter() {
-    window.alert(
-      "Pembuatan surat belum tersedia. Silakan tunggu integrasi dengan backend."
-    );
+  async function handleCompleteLetter() {
+    const issuedLetterId = generatedLetter?.issuedLetter?.id;
+
+    if (issuedLetterId) {
+      try {
+        setIsCompleting(true);
+        await updateLetterStatus(issuedLetterId, "Selesai");
+      } catch (err) {
+        setNotifikasi({
+          judul: "Surat gagal diselesaikan",
+          pesan: err.message || "Gagal menyelesaikan surat. Silakan coba lagi.",
+        });
+        setIsCompleting(false);
+        return;
+      }
+    }
+
+    await hapusDraftSurat().catch(() => undefined);
+
+    setStep(1);
+    setSelectedTemplate(null);
+    setFile(null);
+    setPreview("");
+    setError("");
+    setFormData(initialFormData);
+    setGeneratedLetter(null);
+    setShowPreview(false);
+    setIsCompleting(false);
+
+    navigate("/riwayat");
   }
 
   if (showPreview) {
     return (
-      <LetterPreview
-        formData={formData}
-        letterType={letterType}
-        onBack={() => setShowPreview(false)}
-        onComplete={handleCompleteLetter}
-      />
+      <>
+        <LetterPreview
+          formData={formData}
+          letterTitle={selectedTemplate?.title}
+          letterNumber={formData.nomorSurat}
+          downloadUrl={generatedLetter?.downloadUrl}
+          fileName={generatedLetter?.issuedLetter?.generatedFile}
+          error={error}
+          isCompleting={isCompleting}
+          onBack={() => setShowPreview(false)}
+          onComplete={handleCompleteLetter}
+        />
+
+        <ModalPemberitahuan
+          terbuka={Boolean(notifikasi)}
+          judul={notifikasi?.judul || ""}
+          pesan={notifikasi?.pesan || ""}
+          onTutup={() => setNotifikasi(null)}
+        />
+      </>
     );
   }
 
   return (
+    <>
     <main className="min-h-full -m-6 bg-slate-50 px-6 py-8">
       <div className="mx-auto">
         <div className="mb-8">
@@ -258,23 +506,28 @@ function CreateLetter() {
         {step === 1 && (
           <>
             <LetterTypeSelector
-              selectedType={letterType}
-              onSelect={setLetterType}
+              selectedTemplate={selectedTemplate}
+              onSelect={setSelectedTemplate}
             />
 
             <div className="mt-6 flex justify-end">
               <button
                 type="button"
                 onClick={() => {
-                  if (!letterType) {
+                  if (!selectedTemplate) {
                     setError("Silakan pilih jenis surat terlebih dahulu.");
                     return;
                   }
 
                   setError("");
+                  simpanDraftSurat({
+                    templateId: Number(selectedTemplate.id),
+                    step: 2,
+                    formData,
+                  }).catch(() => undefined);
                   setStep(2);
                 }}
-                disabled={!letterType}
+                disabled={!selectedTemplate}
                 className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Lanjutkan
@@ -291,6 +544,7 @@ function CreateLetter() {
             onFileChange={handleFile}
             onRemove={removeFile}
             onProcess={handleProcessKTP}
+            onSkip={handleSkipOcr}
             onBack={() => {
               setError("");
               setStep(1);
@@ -310,9 +564,18 @@ function CreateLetter() {
               <LetterDetailsForm
                 formData={formData}
                 onChange={handleFormChange}
-                selectedType={letterType}
+                selectedTitle={selectedTemplate?.title}
               />
             </div>
+
+            {error && (
+              <p
+                role="alert"
+                className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+              >
+                {error}
+              </p>
+            )}
 
             <div className="mt-6 flex flex-col-reverse justify-between gap-3 sm:flex-row">
               <button
@@ -326,15 +589,24 @@ function CreateLetter() {
               <button
                 type="button"
                 onClick={handleGenerate}
-                className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                disabled={isSubmitting}
+                className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Buat Surat
+                {isSubmitting ? "Membuat surat..." : "Buat Surat"}
               </button>
             </div>
           </>
         )}
       </div>
     </main>
+
+    <ModalPemberitahuan
+      terbuka={Boolean(notifikasi)}
+      judul={notifikasi?.judul || ""}
+      pesan={notifikasi?.pesan || ""}
+      onTutup={() => setNotifikasi(null)}
+    />
+    </>
   );
 }
 

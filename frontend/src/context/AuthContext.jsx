@@ -1,37 +1,85 @@
-// ============================================================
-// AUTH CONTEXT
-// File ini mengatur status login user di seluruh aplikasi.
-//
-// AuthContext  → tempat menyimpan & membagikan data auth
-// AuthProvider → pembungkus aplikasi agar komponen bisa akses auth
-//
-// Saat ini login masih DUMMY untuk testing:
-// Email    : admin@desa.id
-// Password : admin123
-//
-// Nanti saat backend sudah siap, fungsi login() akan diganti
-// dengan request ke API/backend.
-// ============================================================
-import { createContext, useState } from "react";
-export const AuthContext = createContext(null);
+import { useCallback, useEffect, useState } from "react";
+
+import { AuthContext } from "./auth-context.js";
+import {
+  getMe,
+  login as loginRequest,
+  logout as logoutRequest,
+} from "../services/authService";
+import {
+  clearSession,
+  getStoredUser,
+  getToken,
+  setSession,
+} from "../services/api";
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(() => getStoredUser());
+  const [isAuthenticated, setIsAuthenticated] = useState(() =>
+    Boolean(getToken())
+  );
+  const [isLoading, setIsLoading] = useState(() => Boolean(getToken()));
 
-  function login(email, password) {
-    if (email === "admin@desa.id" && password === "admin123") {
-      setIsAuthenticated(true);
-      return true;
+  useEffect(() => {
+    let aktif = true;
+
+    async function muatSesi() {
+      const token = getToken();
+
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const profile = await getMe();
+
+        if (aktif) {
+          setUser(profile);
+          setSession(token, profile);
+          setIsAuthenticated(true);
+        }
+      } catch {
+        if (aktif) {
+          clearSession();
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } finally {
+        if (aktif) {
+          setIsLoading(false);
+        }
+      }
     }
-    return false;
-  }
 
-  function logout() {
+    muatSesi();
+
+    return () => {
+      aktif = false;
+    };
+  }, []);
+
+  const login = useCallback(async (email, password) => {
+    const data = await loginRequest(email, password);
+
+    setSession(data.token, data.user);
+    setUser(data.user);
+    setIsAuthenticated(true);
+
+    return data.user;
+  }, []);
+
+  const logout = useCallback(async () => {
+    await logoutRequest();
+    clearSession();
+    setUser(null);
     setIsAuthenticated(false);
-  }
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, isLoading, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

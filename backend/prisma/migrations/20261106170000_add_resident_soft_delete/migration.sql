@@ -1,0 +1,1 @@
+ALTER TABLE `residents` ADD COLUMN `deletedAt` DATETIME(3) NULL;

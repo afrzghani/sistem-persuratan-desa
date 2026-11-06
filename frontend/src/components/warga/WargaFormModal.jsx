@@ -115,6 +115,25 @@ function WargaFormModal({
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                Golongan Darah
+              </label>
+              <select
+                name="golonganDarah"
+                value={form.golonganDarah ?? ""}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Pilih golongan darah</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="AB">AB</option>
+                <option value="O">O</option>
+                <option value="-">-</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
                 Agama
               </label>
               <select

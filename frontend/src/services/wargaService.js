@@ -1,88 +1,52 @@
+import { request } from "./api";
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
-// Mengambil semua data warga.
-export async function getWarga() {
-  const response = await fetch(`${BASE_URL}/api/warga`);
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    throw new Error(
-      errorData?.message || "Gagal mengambil data warga",
-    );
-  }
-
-  return response.json();
+function toResidentPayload(dataWarga) {
+  return {
+    nik: String(dataWarga.nik ?? "").trim(),
+    nama: String(dataWarga.nama ?? "").trim(),
+    tempatLahir: String(dataWarga.tempatLahir ?? "").trim(),
+    tanggalLahir: dataWarga.tanggalLahir,
+    jenisKelamin: dataWarga.jenisKelamin,
+    golonganDarah: dataWarga.golonganDarah || undefined,
+    alamat: String(dataWarga.alamat ?? "").trim(),
+    rt: dataWarga.rt || undefined,
+    rw: dataWarga.rw || undefined,
+    kelDesa: dataWarga.kelDesa || "Gempolkurung",
+    kecamatan: dataWarga.kecamatan || "Menganti",
+    kabupaten: dataWarga.kabupaten || "Gresik",
+    agama: dataWarga.agama || undefined,
+    statusPerkawinan: dataWarga.statusPerkawinan || undefined,
+    pekerjaan: dataWarga.pekerjaan || undefined,
+    kewarganegaraan: dataWarga.kewarganegaraan || "WNI",
+  };
 }
 
-// Menambahkan data warga baru.
-export async function tambahWarga(dataWarga) {
-  const response = await fetch(`${BASE_URL}/api/warga`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(dataWarga),
+export function getWarga({ search = "", page = 1, limit = 1000 } = {}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    throw new Error(
-      errorData?.message || "Gagal menambahkan data warga",
-    );
+  if (search.trim()) {
+    params.set("search", search.trim());
   }
 
-  return response.json();
+  return request(`/api/residents?${params.toString()}`);
 }
 
-// Memperbarui data warga berdasarkan NIK lama.
-export async function updateWarga(nik, dataWarga) {
-  const response = await fetch(
-    `${BASE_URL}/api/warga/${encodeURIComponent(nik)}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataWarga),
-    },
-  );
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    throw new Error(
-      errorData?.message || "Gagal mengubah data warga",
-    );
-  }
-
-  return response.json();
+export function tambahWarga(dataWarga) {
+  return request("/api/residents", {
+    method: "POST",
+    body: toResidentPayload(dataWarga),
+  });
 }
 
-// Menghapus data warga berdasarkan NIK.
-export async function hapusWarga(nik) {
-  const response = await fetch(
-    `${BASE_URL}/api/warga/${encodeURIComponent(nik)}`,
-    {
-      method: "DELETE",
-    },
-  );
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    throw new Error(
-      errorData?.message || "Gagal menghapus data warga",
-    );
-  }
-
-  // Mendukung respons backend tanpa isi (204 No Content).
-  if (response.status === 204) {
-    return null;
-  }
-
-  return response.json();
-}
-
-// Kompatibilitas untuk komponen lama yang masih memakai simpanWarga.
-export async function simpanWarga(dataWarga) {
+export function updateWarga(_nik, dataWarga) {
   return tambahWarga(dataWarga);
+}
+
+export function hapusWarga(nik) {
+  return request(`/api/residents/${encodeURIComponent(nik)}`, {
+    method: "DELETE",
+  });
 }

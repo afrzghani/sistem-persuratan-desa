@@ -34,6 +34,29 @@ function LetterDetailsForm({
 
       <div className="mt-5">
         <label
+          htmlFor="nomorSurat"
+          className="text-sm font-medium text-slate-700"
+        >
+          Nomor Surat
+        </label>
+
+        <input
+          id="nomorSurat"
+          name="nomorSurat"
+          value={formData.nomorSurat ?? ""}
+          onChange={handleChange}
+          required
+          placeholder="Contoh: 470/123/2026"
+          className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+        />
+
+        <p className="mt-1.5 text-xs text-slate-500">
+          Nomor surat harus unik dan belum pernah dipakai.
+        </p>
+      </div>
+
+      <div className="mt-5">
+        <label
           htmlFor="purpose"
           className="text-sm font-medium text-slate-700"
         >
@@ -55,6 +78,7 @@ function LetterDetailsForm({
           Contoh: persyaratan administrasi pekerjaan atau pengajuan beasiswa.
         </p>
       </div>
+
     </section>
   );
 }

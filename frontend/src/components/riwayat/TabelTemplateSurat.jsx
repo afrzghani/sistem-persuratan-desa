@@ -1,11 +1,7 @@
 
-import { FileText, Eye, Trash2, Files } from "lucide-react";
+import { FileText, Eye, Files } from "lucide-react";
 
-function TabelTemplateSurat({
-  templates,
-  setTemplateDipilih,
-  hapusTemplate,
-}) {
+function TabelTemplateSurat({ templates, onLihat }) {
   return (
 <div className="overflow-x-auto">
   <table className="w-full table-fixed text-left text-sm">
@@ -37,7 +33,7 @@ function TabelTemplateSurat({
                   </p>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    Klik Tambah Template untuk menambahkan jenis surat.
+                    Template yang terdaftar di server akan muncul di sini.
                   </p>
                 </div>
               </td>
@@ -67,22 +63,12 @@ function TabelTemplateSurat({
                   <div className="flex items-center justify-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setTemplateDipilih(item)}
+                      onClick={() => onLihat(item)}
                       title="Lihat template"
                       aria-label={`Lihat ${item.nama}`}
                       className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600"
                     >
                       <Eye className="h-4 w-4" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => hapusTemplate(item.id)}
-                      title="Hapus template"
-                      aria-label={`Hapus ${item.nama}`}
-                      className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </td>

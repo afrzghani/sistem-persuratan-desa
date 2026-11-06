@@ -8,6 +8,7 @@ function KTPUploader({
   onFileChange,
   onRemove,
   onProcess,
+  onSkip,
   onBack,
   isProcessing,
 }) {
@@ -45,8 +46,8 @@ function KTPUploader({
         </h2>
 
         <p className="mt-1 text-sm leading-6 text-slate-500">
-          Unggah foto KTP pemohon. Data identitas akan diisi otomatis setelah
-          layanan OCR terhubung.
+          Unggah foto KTP pemohon. Data identitas akan diisi otomatis melalui
+          layanan OCR desa.
         </p>
       </div>
 
@@ -169,14 +170,25 @@ function KTPUploader({
           Kembali
         </button>
 
-        <button
-          type="button"
-          onClick={onProcess}
-          disabled={!file || isProcessing}
-          className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {isProcessing ? "Memproses KTP..." : "Proses KTP"}
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={onSkip}
+            disabled={isProcessing}
+            className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Isi data manual
+          </button>
+
+          <button
+            type="button"
+            onClick={onProcess}
+            disabled={!file || isProcessing}
+            className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isProcessing ? "Memproses KTP..." : "Proses KTP"}
+          </button>
+        </div>
       </div>
     </section>
   );

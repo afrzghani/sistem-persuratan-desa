@@ -6,9 +6,9 @@ function AdminHeader() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  function handleLogout() {
-    logout();
-    navigate("/login");
+  async function handleLogout() {
+    await logout();
+    navigate("/login", { replace: true });
   }
 
   const navClass = ({ isActive }) =>

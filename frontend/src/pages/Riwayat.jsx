@@ -1,10 +1,66 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
 import TemplateSurat from "../components/riwayat/TemplateSurat";
 import TabelSurat from "../components/riwayat/arsip/TabelSurat";
-import { getRiwayatSurat } from "../services/templateService";
+import DetailSuratModal from "../components/riwayat/arsip/DetailSuratModal";
+import {
+  getDaftarDraftSurat,
+  getDownloadUrl,
+  getRiwayatSurat,
+  updateLetterStatus,
+} from "../services/letterService";
+
+function sesuaikanSurat(item) {
+  return {
+    ...item,
+    jenisSurat: item.template?.namaSurat ?? "-",
+    pemohon: item.resident?.nama ?? "-",
+    tanggal: item.issuedAt,
+    status: item.status ?? "Proses",
+    fileName: item.generatedFile ?? null,
+    downloadUrl: item.generatedFile
+      ? getDownloadUrl(item.generatedFile)
+      : null,
+  };
+}
+
+function sesuaikanDraft(draft) {
+  const formData = draft.formData || {};
+
+  return {
+    id: `draft-${draft.id}`,
+    nomorSurat: formData.nomorSurat || "Draft",
+    jenisSurat: draft.template?.namaSurat ?? "-",
+    pemohon: formData.fullName || "-",
+    keperluan: formData.purpose || "",
+    tanggal: draft.updatedAt ?? draft.createdAt,
+    status: "Proses",
+    fileName: null,
+    downloadUrl: null,
+    isDraft: true,
+  };
+}
+
+async function ambilRiwayatSurat() {
+  const [data, drafts] = await Promise.all([
+    getRiwayatSurat({ limit: 100 }),
+    getDaftarDraftSurat().catch(() => []),
+  ]);
+
+  const letters = Array.isArray(data?.letters) ? data.letters : [];
+  const daftarDraft = Array.isArray(drafts) ? drafts : [];
+
+  return [
+    ...daftarDraft.map(sesuaikanDraft),
+    ...letters.map(sesuaikanSurat),
+  ].sort(
+    (a, b) =>
+      new Date(b.tanggal || 0).getTime() -
+      new Date(a.tanggal || 0).getTime()
+  );
+}
 
 function formatTanggal(tanggal) {
   if (!tanggal) return "-";
@@ -26,21 +82,14 @@ function Riwayat() {
   const [error, setError] = useState("");
   const [kataKunci, setKataKunci] = useState("");
   const [filterStatus, setFilterStatus] = useState("Semua");
+  const [suratDipilih, setSuratDipilih] = useState(null);
+  const [isFinalizing, setIsFinalizing] = useState(false);
+  const [finalizeError, setFinalizeError] = useState("");
 
-  async function muatRiwayatSurat() {
+  const muatRiwayatSurat = useCallback(async () => {
     try {
-      setLoading(true);
+      setSurat(await ambilRiwayatSurat());
       setError("");
-
-      const data = await getRiwayatSurat();
-
-      if (!Array.isArray(data)) {
-        throw new Error(
-          "Format data riwayat surat dari server tidak valid.",
-        );
-      }
-
-      setSurat(data);
     } catch (err) {
       setError(
         err.message || "Gagal memuat riwayat surat dari server.",
@@ -48,10 +97,32 @@ function Riwayat() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    muatRiwayatSurat();
+    let aktif = true;
+
+    ambilRiwayatSurat()
+      .then((data) => {
+        if (!aktif) return;
+
+        setSurat(data);
+        setError("");
+      })
+      .catch((err) => {
+        if (aktif) {
+          setError(err.message || "Gagal memuat riwayat surat dari server.");
+        }
+      })
+      .finally(() => {
+        if (aktif) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      aktif = false;
+    };
   }, []);
 
   const suratDitampilkan = useMemo(() => {
@@ -80,14 +151,31 @@ function Riwayat() {
   }
 
   function handleLihatSurat(item) {
-    // Sementara tampilkan detail sederhana.
-    // Nanti bisa dihubungkan ke modal detail surat.
-    window.alert(
-      `Nomor Surat: ${item.nomorSurat}\n` +
-        `Jenis Surat: ${item.jenisSurat}\n` +
-        `Pemohon: ${item.pemohon}\n` +
-        `Status: ${item.status}`,
-    );
+    setFinalizeError("");
+    setSuratDipilih(item);
+  }
+
+  function handleTutupDetail() {
+    setFinalizeError("");
+    setSuratDipilih(null);
+  }
+
+  async function handleSelesaikanSurat(item) {
+    if (!item?.id || item.isDraft) return;
+
+    try {
+      setIsFinalizing(true);
+      setFinalizeError("");
+      await updateLetterStatus(item.id, "Selesai");
+      await muatRiwayatSurat();
+      setSuratDipilih(null);
+    } catch (err) {
+      setFinalizeError(
+        err.message || "Gagal menyelesaikan surat. Silakan coba lagi.",
+      );
+    } finally {
+      setIsFinalizing(false);
+    }
   }
 
   if (loading) {
@@ -123,7 +211,10 @@ function Riwayat() {
 
         <button
           type="button"
-          onClick={muatRiwayatSurat}
+          onClick={() => {
+            setLoading(true);
+            muatRiwayatSurat();
+          }}
           className="mt-5 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
         >
           <RefreshCw className="h-4 w-4" />
@@ -135,6 +226,23 @@ function Riwayat() {
 
   return (
     <div className="space-y-8">
+      <div className="mb-8">
+          <div className="mb-1 flex items-center gap-2 text-sm">
+            <span className="text-slate-500">Dashboard</span>
+            <span className="text-slate-500">/</span>
+            <span className="font-medium text-emerald-600">
+              Arsip Surat
+            </span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-slate-800">
+            Arsip Surat
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Lihat riwayat surat yang telah dibuat.
+          </p>
+        </div>
       <TemplateSurat />
 
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -162,8 +270,8 @@ function Riwayat() {
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
             >
               <option value="Semua">Semua status</option>
+              <option value="Proses">Proses</option>
               <option value="Selesai">Selesai</option>
-              <option value="Diproses">Diproses</option>
             </select>
           </div>
         </div>
@@ -176,6 +284,15 @@ function Riwayat() {
           formatTanggal={formatTanggal}
         />
       </section>
+
+      <DetailSuratModal
+        suratDipilih={suratDipilih}
+        onTutup={handleTutupDetail}
+        formatTanggal={formatTanggal}
+        onSelesaikan={handleSelesaikanSurat}
+        isFinalizing={isFinalizing}
+        finalizeError={finalizeError}
+      />
     </div>
   );
 }

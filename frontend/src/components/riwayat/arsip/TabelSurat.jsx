@@ -6,35 +6,21 @@ function TabelSurat({
   suratDitampilkan,
   onLihat,
   onResetFilter,
-  onPulihkanData,
   formatTanggal,
 }) {
   function downloadSurat(item) {
-    const isiSurat = [
-      "ARSIP SURAT",
-      "==============================",
-      `Nomor Surat: ${item.nomorSurat}`,
-      `Jenis Surat: ${item.jenisSurat}`,
-      `Nama Pemohon: ${item.pemohon}`,
-      `Tanggal: ${formatTanggal(item.tanggal)}`,
-      `Status: ${item.status}`,
-    ].join("\n");
+    if (!item.downloadUrl) {
+      window.alert("File surat tidak tersedia di server.");
+      return;
+    }
 
-    const file = new Blob([isiSurat], {
-      type: "text/plain;charset=utf-8",
-    });
-
-    const url = URL.createObjectURL(file);
     const link = document.createElement("a");
-
-    link.href = url;
-    link.download = `${item.nomorSurat.replaceAll("/", "-")}.txt`;
+    link.href = item.downloadUrl;
+    link.download = item.fileName || "surat.docx";
 
     document.body.appendChild(link);
     link.click();
     link.remove();
-
-    URL.revokeObjectURL(url);
   }
 
   return (
@@ -77,14 +63,6 @@ function TabelSurat({
                   <p className="mt-1 text-sm text-slate-500">
                     Surat yang diajukan akan muncul di sini.
                   </p>
-
-                  <button
-                    type="button"
-                    onClick={onPulihkanData}
-                    className="mt-4 text-sm font-medium text-emerald-600 hover:text-emerald-700"
-                  >
-                    Pulihkan data contoh
-                  </button>
                 </div>
               </td>
             </tr>
@@ -161,9 +139,14 @@ function TabelSurat({
                     <button
                       type="button"
                       onClick={() => downloadSurat(item)}
-                      title="Download informasi surat"
+                      disabled={!item.downloadUrl}
+                      title={
+                        item.downloadUrl
+                          ? "Unduh surat"
+                          : "File surat tidak tersedia"
+                      }
                       aria-label={`Download ${item.nomorSurat}`}
-                      className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                      className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <Download className="h-4 w-4" />
                     </button>
