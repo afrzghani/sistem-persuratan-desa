@@ -1,9 +1,10 @@
+import { createPortal } from "react-dom";
 import { AlertCircle, X } from "lucide-react";
 
 function ModalPemberitahuan({ terbuka, judul, pesan, onTutup }) {
   if (!terbuka) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 p-4"
       onClick={onTutup}
@@ -51,7 +52,8 @@ function ModalPemberitahuan({ terbuka, judul, pesan, onTutup }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

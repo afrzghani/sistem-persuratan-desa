@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   AlertCircle,
   Download,
@@ -79,7 +80,7 @@ function DetailTemplateSurat({ template, onTutup }) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
       onClick={onTutup}
@@ -178,7 +179,8 @@ function DetailTemplateSurat({ template, onTutup }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

@@ -1,5 +1,15 @@
 
-import { Download, Eye, Files, Search } from "lucide-react";
+import { useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Eye,
+  Files,
+  Search,
+} from "lucide-react";
+
+const PER_PAGE = 8;
 
 function TabelSurat({
   surat,
@@ -8,6 +18,16 @@ function TabelSurat({
   onResetFilter,
   formatTanggal,
 }) {
+  const [halaman, setHalaman] = useState(1);
+
+  const totalHalaman = Math.max(
+    1,
+    Math.ceil(suratDitampilkan.length / PER_PAGE),
+  );
+  const halamanAktif = Math.min(halaman, totalHalaman);
+  const mulai = (halamanAktif - 1) * PER_PAGE;
+  const daftarTampil = suratDitampilkan.slice(mulai, mulai + PER_PAGE);
+
   function downloadSurat(item) {
     if (!item.downloadUrl) {
       window.alert("File surat tidak tersedia di server.");
@@ -24,8 +44,9 @@ function TabelSurat({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
+    <div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm">
         <thead className="border-y border-slate-200 bg-emerald-600">
           <tr>
             <th className="whitespace-nowrap px-6 py-4 font-semibold text-white">
@@ -91,7 +112,7 @@ function TabelSurat({
               </td>
             </tr>
           ) : (
-            suratDitampilkan.map((item) => (
+            daftarTampil.map((item) => (
               <tr
                 key={item.id}
                 className="border-b border-slate-100 last:border-0 transition hover:bg-slate-50/70"
@@ -157,6 +178,45 @@ function TabelSurat({
           )}
         </tbody>
       </table>
+      </div>
+
+      {suratDitampilkan.length > PER_PAGE && (
+        <div className="flex flex-col gap-3 border-t border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-500">
+            Menampilkan {mulai + 1}-
+            {Math.min(mulai + PER_PAGE, suratDitampilkan.length)} dari{" "}
+            {suratDitampilkan.length} surat
+          </p>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setHalaman(Math.max(1, halamanAktif - 1))}
+              disabled={halamanAktif === 1}
+              aria-label="Halaman sebelumnya"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            <span className="min-w-16 text-center text-sm font-medium text-slate-600">
+              {halamanAktif} / {totalHalaman}
+            </span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setHalaman(Math.min(totalHalaman, halamanAktif + 1))
+              }
+              disabled={halamanAktif === totalHalaman}
+              aria-label="Halaman berikutnya"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

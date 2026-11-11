@@ -1,4 +1,15 @@
+import { useEffect, useState } from "react";
 import { Download, ArrowLeft, CheckCircle } from "lucide-react";
+
+import { getDesaSettings } from "../../services/desaService";
+
+const DEFAULT_DESA = {
+  namaDesa: "Gempolkurung",
+  kecamatan: "Menganti",
+  kabupaten: "Gresik",
+  namaKepalaDesa: "H. SUBANDI",
+  jabatan: "Kepala Desa",
+};
 
 function formatTanggal(tanggal) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -21,6 +32,23 @@ function LetterPreview({
 }) {
   const judulSurat = letterTitle || "Surat Keterangan";
   const tanggalSekarang = new Date().toISOString();
+  const [desa, setDesa] = useState(DEFAULT_DESA);
+
+  useEffect(() => {
+    let aktif = true;
+
+    getDesaSettings()
+      .then((data) => {
+        if (aktif) {
+          setDesa((prev) => ({ ...prev, ...data }));
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      aktif = false;
+    };
+  }, []);
 
   function downloadSurat() {
     if (!downloadUrl) {
@@ -77,10 +105,14 @@ function LetterPreview({
           <article className="mx-auto max-w-3xl border border-slate-200 p-6 text-slate-800 sm:p-10">
             <header className="text-center">
               <h3 className="text-base font-bold">
-                PEMERINTAH DESA GEMPOLKURUNG
+                PEMERINTAH DESA {desa.namaDesa.toUpperCase()}
               </h3>
-              <p className="font-semibold">KECAMATAN MENGANTI</p>
-              <p className="text-sm">KABUPATEN GRESIK</p>
+              <p className="font-semibold">
+                KECAMATAN {desa.kecamatan.toUpperCase()}
+              </p>
+              <p className="text-sm">
+                KABUPATEN {desa.kabupaten.toUpperCase()}
+              </p>
               <div className="my-4 border-t-2 border-slate-800" />
               <h3 className="text-base font-bold underline">
                 {judulSurat.toUpperCase()}
@@ -129,10 +161,12 @@ function LetterPreview({
             </div>
 
             <div className="ml-auto mt-12 max-w-56 text-center text-sm">
-              <p>Gempolkurung, {formatTanggal(tanggalSekarang)}</p>
-              <p className="mt-1">Kepala Desa</p>
+              <p>
+                {desa.namaDesa}, {formatTanggal(tanggalSekarang)}
+              </p>
+              <p className="mt-1">{desa.jabatan}</p>
               <div className="h-20" />
-              <p className="font-bold">H. SUBANDI</p>
+              <p className="font-bold">{desa.namaKepalaDesa}</p>
             </div>
           </article>
         </section>

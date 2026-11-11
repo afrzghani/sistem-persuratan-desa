@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Files, Plus, X } from "lucide-react";
+import { CheckCircle2, Files, Plus, X } from "lucide-react";
 
 import { createTemplate, getTemplates } from "../../services/templateService";
 
@@ -29,6 +29,14 @@ function TemplateSurat() {
   const [progress, setProgress] = useState(0);
   const [formError, setFormError] = useState("");
   const [pesanSukses, setPesanSukses] = useState("");
+
+  useEffect(() => {
+    if (!pesanSukses) return;
+
+    const timer = setTimeout(() => setPesanSukses(""), 5000);
+
+    return () => clearTimeout(timer);
+  }, [pesanSukses]);
 
   useEffect(() => {
     let masihAktif = true;
@@ -136,7 +144,10 @@ function TemplateSurat() {
         {error && <p className="px-6 pt-4 text-sm text-red-600">{error}</p>}
 
         {pesanSukses && (
-          <p className="px-6 pt-4 text-sm text-emerald-600">{pesanSukses}</p>
+          <div className="mx-6 mt-4 mb-4 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            <p>{pesanSukses}</p>
+          </div>
         )}
 
         {formTerbuka && (

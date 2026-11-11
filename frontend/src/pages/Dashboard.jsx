@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import WelcomeCard from "../components/dashboard/WelcomeCard";
 import QuickActions from "../components/dashboard/QuickActions";
 import DashboardStats from "../components/dashboard/DashboardStats";
-import RecentLetters from "../components/dashboard/RecentLetters";
+import ArsipSurat from "../components/riwayat/arsip/ArsipSurat";
 import CompletedLettersChart from "../components/dashboard/CompletedLettersChart";
 
 import { getDashboard } from "../services/dashboardService";
@@ -95,7 +95,7 @@ function Dashboard() {
         </div>
       ) : (
         <>
-          <RecentLetters suratTerbaru={dashboard.suratTerbaru || []} />
+          <ArsipSurat tampilkanLihatSemua />
 
           <CompletedLettersChart
             data={dashboard.suratSelesaiBulanan || []}

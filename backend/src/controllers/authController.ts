@@ -39,6 +39,11 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
       return;
     }
 
+    if (!user.isActive) {
+      errorResponse(res, 'Akun Anda dinonaktifkan. Hubungi administrator desa.', 403);
+      return;
+    }
+
     const token = jwt.sign(
       {
         userId: user.id,

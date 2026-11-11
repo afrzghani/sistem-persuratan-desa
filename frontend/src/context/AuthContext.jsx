@@ -69,6 +69,13 @@ export function AuthProvider({ children }) {
     return data.user;
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    const profile = await getMe();
+    setUser(profile);
+    setSession(getToken(), profile);
+    return profile;
+  }, []);
+
   const logout = useCallback(async () => {
     await logoutRequest();
     clearSession();
@@ -78,7 +85,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, isLoading, login, logout }}
+      value={{ user, isAuthenticated, isLoading, login, logout, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

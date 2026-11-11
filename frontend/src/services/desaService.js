@@ -10,13 +10,3 @@ export function updateDesaSettings(data) {
     body: data,
   });
 }
-
-export function uploadLogoDesa(file) {
-  const formData = new FormData();
-  formData.append("logo", file);
-
-  return request("/api/desa/logo", {
-    method: "POST",
-    body: formData,
-  });
-}

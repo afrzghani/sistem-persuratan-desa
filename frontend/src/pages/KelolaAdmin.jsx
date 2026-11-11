@@ -1,14 +1,113 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import AdminStats from "../components/kelola_admin/AdminStats";
+import AdminTable from "../components/kelola_admin/AdminTable";
+import FormEditAdmin from "../components/kelola_admin/FormEditAdmin";
 import FormTambahAdmin from "../components/kelola_admin/FormTambahAdmin";
+import {
+  activateAdmin,
+  deactivateAdmin,
+  getAdmins,
+} from "../services/adminService";
 
 function KelolaAdmin() {
-  const [showFormTambah, setShowFormTambah] = useState(false);
+  const [admins, setAdmins] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [showFormTambah, setShowFormTambah] = useState(false);
+  const [adminDiedit, setAdminDiedit] = useState(null);
+  const [processingId, setProcessingId] = useState(null);
+
+  async function muatAdmins() {
+    setIsLoading(true);
+
+    try {
+      const data = await getAdmins();
+      setAdmins(Array.isArray(data) ? data : []);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Gagal memuat data admin.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    let aktif = true;
+
+    async function muatDataAwal() {
+      try {
+        const data = await getAdmins();
+
+        if (aktif) {
+          setAdmins(Array.isArray(data) ? data : []);
+          setError("");
+        }
+      } catch (err) {
+        if (aktif) {
+          setError(err.message || "Gagal memuat data admin.");
+        }
+      } finally {
+        if (aktif) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    muatDataAwal();
+
+    return () => {
+      aktif = false;
+    };
+  }, []);
 
   function handleTambahBerhasil() {
     setShowFormTambah(false);
     setMessage("Akun admin berhasil ditambahkan.");
+    muatAdmins();
+  }
+
+  function handleEditBerhasil() {
+    setAdminDiedit(null);
+    setMessage("Data admin berhasil diperbarui.");
+    muatAdmins();
+  }
+
+  async function handleToggleStatus(admin) {
+    setProcessingId(admin.id);
+    setError("");
+    setMessage("");
+
+    try {
+      if (admin.status === "Aktif") {
+        await deactivateAdmin(admin.id);
+        setMessage(`Akun ${admin.name} berhasil dinonaktifkan.`);
+      } else {
+        await activateAdmin(admin.id);
+        setMessage(`Akun ${admin.name} berhasil diaktifkan.`);
+      }
+
+      await muatAdmins();
+    } catch (err) {
+      setError(err.message || "Gagal mengubah status admin.");
+    } finally {
+      setProcessingId(null);
+    }
+  }
+
+  function bukaFormTambah() {
+    setMessage("");
+    setError("");
+    setAdminDiedit(null);
+    setShowFormTambah((sebelumnya) => !sebelumnya);
+  }
+
+  function bukaFormEdit(admin) {
+    setMessage("");
+    setError("");
+    setShowFormTambah(false);
+    setAdminDiedit(admin);
   }
 
   return (
@@ -29,26 +128,27 @@ function KelolaAdmin() {
             </h1>
 
             <p className="mt-1 text-sm text-slate-500">
-              Tambah akun yang memiliki akses ke sistem administrasi desa.
+              Kelola akun yang memiliki akses ke sistem administrasi desa.
             </p>
           </div>
 
           <button
             type="button"
-            onClick={() => {
-              setMessage("");
-              setShowFormTambah((sebelumnya) => !sebelumnya);
-            }}
+            onClick={bukaFormTambah}
             className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
           >
             {showFormTambah ? "Tutup Form" : "+ Tambah Admin"}
           </button>
         </div>
 
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Daftar, edit, dan nonaktifkan admin belum tersedia di backend.
-          Saat ini hanya pembuatan akun admin baru yang didukung.
-        </div>
+        {error && (
+          <div
+            role="alert"
+            className="mb-6 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {error}
+          </div>
+        )}
 
         {message && (
           <div
@@ -59,8 +159,10 @@ function KelolaAdmin() {
           </div>
         )}
 
+        <AdminStats admins={admins} />
+
         {showFormTambah && (
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
             <div className="border-b border-slate-100 p-6">
               <h2 className="text-lg font-semibold text-slate-800">
                 Tambah Akun Admin
@@ -77,6 +179,35 @@ function KelolaAdmin() {
             />
           </div>
         )}
+
+        {adminDiedit && (
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="border-b border-slate-100 p-6">
+              <h2 className="text-lg font-semibold text-slate-800">
+                Edit Akun Admin
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Perbarui nama atau email akun admin.
+              </p>
+            </div>
+
+            <FormEditAdmin
+              key={adminDiedit.id}
+              admin={adminDiedit}
+              onSuccess={handleEditBerhasil}
+              onCancel={() => setAdminDiedit(null)}
+            />
+          </div>
+        )}
+
+        <AdminTable
+          admins={admins}
+          isLoading={isLoading}
+          onEdit={bukaFormEdit}
+          onToggleStatus={handleToggleStatus}
+          processingId={processingId}
+        />
       </div>
     </div>
   );

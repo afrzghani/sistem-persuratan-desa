@@ -13,12 +13,23 @@ model User {
   password      String
   name          String
   role          String         @default("OPERATOR")
+  isActive      Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   issuedLetters IssuedLetter[]
   letterDraft   LetterDraft?
 
   @@map("users")
+}
+
+model DesaSetting {
+  id             Int      @id @default(autoincrement())
+  namaKepalaDesa String   @default("H. SUBANDI")
+  jabatan        String   @default("Kepala Desa")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("desa_settings")
 }
 
 model Resident {

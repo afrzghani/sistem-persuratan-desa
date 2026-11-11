@@ -1,4 +1,5 @@
 
+import { createPortal } from "react-dom";
 import { FileText, X } from "lucide-react";
 
 function DetailSuratModal({
@@ -19,7 +20,7 @@ function DetailSuratModal({
     suratDipilih.dataPemohon?.purpose ||
     "-";
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
       onClick={onTutup}
@@ -152,7 +153,8 @@ function DetailSuratModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

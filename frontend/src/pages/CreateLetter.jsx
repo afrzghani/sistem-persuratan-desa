@@ -293,6 +293,19 @@ function CreateLetter() {
     setStep(3);
   }
 
+  async function handleKembaliPilihTemplate() {
+    setStep(1);
+    setSelectedTemplate(null);
+    setFile(null);
+    setPreview("");
+    setError("");
+    setFormData(initialFormData);
+    setGeneratedLetter(null);
+    setShowPreview(false);
+
+    await hapusDraftSurat().catch(() => undefined);
+  }
+
   async function handleGenerate() {
     const requiredFields = [
       ["nik", "NIK"],
@@ -545,10 +558,7 @@ function CreateLetter() {
             onRemove={removeFile}
             onProcess={handleProcessKTP}
             onSkip={handleSkipOcr}
-            onBack={() => {
-              setError("");
-              setStep(1);
-            }}
+            onBack={handleKembaliPilihTemplate}
             isProcessing={isProcessing}
           />
         )}

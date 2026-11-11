@@ -8,14 +8,6 @@ export function login(email, password) {
   });
 }
 
-export function registerAdmin({ name, email, password, role = "ADMIN" }) {
-  return request("/api/auth/register", {
-    method: "POST",
-    body: { name, email, password, role },
-    auth: false,
-  });
-}
-
 export function getMe() {
   return request("/api/auth/me");
 }

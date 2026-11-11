@@ -19,6 +19,7 @@ function FormTemplateSurat({
 }) {
   const [namaTemplate, setNamaTemplate] = useState("");
   const [kodeSurat, setKodeSurat] = useState("");
+  const [deskripsi, setDeskripsi] = useState("");
   const [fileTemplate, setFileTemplate] = useState(null);
 
   const inputRef = useRef(null);
@@ -26,6 +27,7 @@ function FormTemplateSurat({
   function resetForm() {
     setNamaTemplate("");
     setKodeSurat("");
+    setDeskripsi("");
     setFileTemplate(null);
     setError("");
 
@@ -98,6 +100,7 @@ function FormTemplateSurat({
     const berhasil = await onSimpan({
       namaSurat: nama,
       kodeSurat: kode,
+      deskripsi: deskripsi.trim(),
       file: fileTemplate,
     });
 
@@ -156,6 +159,30 @@ function FormTemplateSurat({
             className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm uppercase text-slate-700 outline-none transition placeholder:normal-case placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
           />
         </div>
+      </div>
+
+      {/* Deskripsi template */}
+      <div className="mt-4">
+        <label
+          htmlFor="deskripsi-template"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
+          Deskripsi <span className="font-normal text-slate-400">(opsional)</span>
+        </label>
+
+        <textarea
+          id="deskripsi-template"
+          value={deskripsi}
+          onChange={(e) => setDeskripsi(e.target.value)}
+          placeholder="Contoh: Surat keterangan untuk keperluan bantuan sosial."
+          maxLength={500}
+          rows={3}
+          className="w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+        />
+
+        <p className="mt-1 text-xs text-slate-400">
+          {deskripsi.length}/500 karakter
+        </p>
       </div>
 
       {/* Pilih file Word */}

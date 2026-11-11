@@ -6,7 +6,15 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma.js';
 import { AuthenticatedRequest } from '../types/index.js';
 import { generateDocumentFromTemplate, LetterTemplateVariables } from '../services/docxtemplaterService.js';
+import { getOrCreateDesaSettings } from '../services/desaSettingsService.js';
 import { successResponse, errorResponse } from '../utils/response.js';
+
+const DESA_IDENTITY = {
+  namaDesa: 'Gempolkurung',
+  kecamatan: 'Menganti',
+  kabupaten: 'Gresik',
+  alamatDesa: 'Jl. Desa Gempolkurung No. 332A, Menganti, Gresik 61174'
+};
 
 export const generateLetterSchema = z.object({
   residentNik: z.string().length(16, 'NIK harus terdiri dari 16 digit'),
@@ -184,6 +192,8 @@ export const issueLetter = async (
       return;
     }
 
+    const desaSettings = await getOrCreateDesaSettings();
+
     const nomorSuratTerpakai = await prisma.issuedLetter.findUnique({
       where: { nomorSurat: validated.nomorSurat },
       select: { id: true }
@@ -219,7 +229,7 @@ export const issueLetter = async (
       nomor_surat: validated.nomorSurat,
       no_surat: validated.nomorSurat,
       keperluan: validated.keperluan,
-      keterangan: validated.keterangan || 'orang tersebut di atas benar-benar penduduk Desa Gempolkurung Kecamatan Menganti Kabupaten Gresik dan sepanjang pengetahuan kami hingga saat ini belum pernah menikah (Jejaka / Perawan).',
+      keterangan: validated.keterangan || `orang tersebut di atas benar-benar penduduk Desa ${DESA_IDENTITY.namaDesa} Kecamatan ${DESA_IDENTITY.kecamatan} Kabupaten ${DESA_IDENTITY.kabupaten} dan sepanjang pengetahuan kami hingga saat ini belum pernah menikah (Jejaka / Perawan).`,
       tanggal_surat: formattedTanggalSurat,
       nama: resident.nama,
       nik: resident.nik,
@@ -234,21 +244,26 @@ export const issueLetter = async (
       alamat_singkat: resident.alamat,
       rt: resident.rt || '-',
       rw: resident.rw || '-',
-      kel_desa: resident.kelDesa,
-      desa: resident.kelDesa,
-      kecamatan: resident.kecamatan,
-      kabupaten: resident.kabupaten,
+      kel_desa: DESA_IDENTITY.namaDesa,
+      desa: DESA_IDENTITY.namaDesa,
+      kecamatan: DESA_IDENTITY.kecamatan,
+      kabupaten: DESA_IDENTITY.kabupaten,
       agama: resident.agama || '-',
       status_perkawinan: resident.statusPerkawinan || '-',
       status_kawin: resident.statusPerkawinan || '-',
       pekerjaan: resident.pekerjaan || '-',
       kewarganegaraan: resident.kewarganegaraan,
-      kepala_desa: 'H. SUBANDI',
+      kepala_desa: desaSettings.namaKepalaDesa,
+      jabatan_kepala_desa: desaSettings.jabatan,
+      alamat_desa: DESA_IDENTITY.alamatDesa,
+      ...(template.kodeSurat === 'SKBN'
+        ? { jabatan: desaSettings.jabatan }
+        : {}),
 
       No_Surat: validated.nomorSurat,
       Nomor_Surat: validated.nomorSurat,
       Keperluan: validated.keperluan,
-      Keterangan: validated.keterangan || 'orang tersebut di atas benar-benar penduduk Desa Gempolkurung Kecamatan Menganti Kabupaten Gresik dan sepanjang pengetahuan kami hingga saat ini belum pernah menikah (Jejaka / Perawan).',
+      Keterangan: validated.keterangan || `orang tersebut di atas benar-benar penduduk Desa ${DESA_IDENTITY.namaDesa} Kecamatan ${DESA_IDENTITY.kecamatan} Kabupaten ${DESA_IDENTITY.kabupaten} dan sepanjang pengetahuan kami hingga saat ini belum pernah menikah (Jejaka / Perawan).`,
       Tanggal_Surat: formattedTanggalSurat,
       Nama: resident.nama,
       NIK: resident.nik,
@@ -262,16 +277,21 @@ export const issueLetter = async (
       Alamat: fullAddress,
       RT: resident.rt || '-',
       RW: resident.rw || '-',
-      Kel_Desa: resident.kelDesa,
-      Desa: resident.kelDesa,
-      Kecamatan: resident.kecamatan,
-      Kabupaten: resident.kabupaten,
+      Kel_Desa: DESA_IDENTITY.namaDesa,
+      Desa: DESA_IDENTITY.namaDesa,
+      Kecamatan: DESA_IDENTITY.kecamatan,
+      Kabupaten: DESA_IDENTITY.kabupaten,
       Agama: resident.agama || '-',
       Status_Perkawinan: resident.statusPerkawinan || '-',
       Status_Kawin: resident.statusPerkawinan || '-',
       Pekerjaan: resident.pekerjaan || '-',
       Kewarganegaraan: resident.kewarganegaraan,
-      Kepala_Desa: 'H. SUBANDI',
+      Kepala_Desa: desaSettings.namaKepalaDesa,
+      Jabatan_Kepala_Desa: desaSettings.jabatan,
+      Alamat_Desa: DESA_IDENTITY.alamatDesa,
+      ...(template.kodeSurat === 'SKBN'
+        ? { Jabatan: desaSettings.jabatan }
+        : {}),
 
       ...(validated.customData || {})
     };

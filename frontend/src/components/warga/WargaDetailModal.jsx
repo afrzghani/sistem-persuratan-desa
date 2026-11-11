@@ -1,4 +1,5 @@
 
+import { createPortal } from "react-dom";
 import { X, UserRound } from "lucide-react";
 
 function WargaDetailModal({ warga, tutupDetail, formatTanggal }) {
@@ -23,9 +24,10 @@ function WargaDetailModal({ warga, tutupDetail, formatTanggal }) {
     },
   ];
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-xl">
+      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+        <div className="min-h-0 overflow-y-auto">
         {/* Header modal */}
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div className="flex items-center gap-3">
@@ -97,8 +99,10 @@ function WargaDetailModal({ warga, tutupDetail, formatTanggal }) {
             Tutup
           </button>
         </div>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
