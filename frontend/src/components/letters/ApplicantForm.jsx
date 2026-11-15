@@ -39,6 +39,19 @@ const fields = [
     required: true,
   },
   {
+    name: "bloodType",
+    label: "Golongan darah",
+    type: "select",
+    options: [
+      { value: "", label: "Pilih golongan darah" },
+      { value: "A", label: "A" },
+      { value: "B", label: "B" },
+      { value: "AB", label: "AB" },
+      { value: "O", label: "O" },
+      { value: "-", label: "-" },
+    ],
+  },
+  {
     name: "religion",
     label: "Agama",
     type: "select",

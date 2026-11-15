@@ -1,12 +1,5 @@
 
-import {
-  Search,
-  UserRound,
-  Plus,
-  Eye,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { Search, UserRound, Plus, Eye, Pencil, Trash2 } from "lucide-react";
 
 function WargaTable({
   warga,
@@ -15,7 +8,8 @@ function WargaTable({
   setPencarian,
   bukaForm,
   bukaDetail,
-  handleHapus,
+  hapusWarga,
+  nikDihapus,
 }) {
   return (
     <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -147,8 +141,9 @@ function WargaTable({
                         type="button"
                         title="Hapus warga"
                         aria-label={`Hapus ${item.nama}`}
-                        onClick={() => handleHapus(item.nik)}
-                        className="rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600"
+                        onClick={() => hapusWarga(item)}
+                        disabled={nikDihapus === item.nik}
+                        className="rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-red-300 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Trash2 size={16} />
                       </button>

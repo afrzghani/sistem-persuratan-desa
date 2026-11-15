@@ -1,16 +1,17 @@
-const BASE_URL = import.meta.env.VITE_BACKEND_URL
+import { request } from "./api";
 
-export async function registerAdmin({ name, email, password }) {
-  const response = await fetch(`${BASE_URL}/api/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password }),
-  })
+export function login(email, password) {
+  return request("/api/auth/login", {
+    method: "POST",
+    body: { email, password },
+    auth: false,
+  });
+}
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null)
-    throw new Error(errorData?.message || 'Registrasi gagal')
-  }
+export function getMe() {
+  return request("/api/auth/me");
+}
 
-  return response.json()
+export function logout() {
+  return request("/api/auth/logout", { method: "POST" }).catch(() => null);
 }

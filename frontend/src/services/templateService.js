@@ -1,51 +1,62 @@
+import { clearSession, getApiUrl, getToken, request } from "./api";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
-
-// Ambil daftar template dari backend
-export async function getTemplates() {
-  const response = await fetch(`${API_URL}/api/templates`);
-
-  if (!response.ok) {
-    throw new Error("Gagal mengambil data template dari server.");
-  }
-
-  const result = await response.json();
-
-  // Sesuaikan jika backend mengembalikan { data: [...] }
-  return Array.isArray(result) ? result : result.data;
+export function getTemplates() {
+  return request("/api/letters/templates");
 }
 
-// Upload template ke backend dengan progress
-export function addTemplate(
-  namaTemplate,
-  fileTemplate,
-  onProgress = () => {},
+export function createTemplate(
+  { namaSurat, kodeSurat, deskripsi, file },
+  onProgress,
 ) {
-  const formData = new FormData();
-  formData.append("namaTemplate", namaTemplate.trim());
-  formData.append("file", fileTemplate);
-
   return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append("namaSurat", namaSurat);
+    formData.append("kodeSurat", kodeSurat);
 
-    xhr.open("POST", `${API_URL}/api/templates`);
+    if (deskripsi) {
+      formData.append("deskripsi", deskripsi);
+    }
+
+    formData.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", getApiUrl("/api/letters/templates"));
+
+    const token = getToken();
+
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
 
     xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
+      if (event.lengthComputable && typeof onProgress === "function") {
         onProgress(Math.round((event.loaded / event.total) * 100));
       }
     };
 
     xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          resolve(JSON.parse(xhr.responseText));
-        } catch {
-          reject(new Error("Respons server tidak valid."));
-        }
-      } else {
-        reject(new Error("Gagal mengunggah template ke server."));
+      let payload;
+
+      try {
+        payload = JSON.parse(xhr.responseText);
+      } catch {
+        payload = null;
       }
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(payload?.data ?? payload);
+        return;
+      }
+
+      if (xhr.status === 401) {
+        clearSession();
+
+        if (!window.location.pathname.startsWith("/login")) {
+          window.location.assign("/login");
+        }
+      }
+
+      reject(new Error(payload?.message || "Gagal mengunggah template."));
     };
 
     xhr.onerror = () => {
@@ -56,49 +67,34 @@ export function addTemplate(
   });
 }
 
-// Hapus template melalui backend
-export async function deleteTemplate(id) {
-  const response = await fetch(`${API_URL}/api/templates/${id}`, {
-    method: "DELETE",
-  });
+export async function getTemplateFile(id) {
+  const token = getToken();
+  const response = await fetch(
+    getApiUrl(`/api/letters/templates/${id}/file`),
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  );
 
   if (!response.ok) {
-    throw new Error("Gagal menghapus template dari server.");
-  }
-
-  return true;
-}
-
-
-// ================================
-// RIWAYAT SURAT
-// ================================
-
-// Ambil daftar riwayat surat dari backend
-export async function getRiwayatSurat() {
-  const response = await fetch(`${API_URL}/api/riwayat-surat`);
-
-  if (!response.ok) {
-    let pesanError = "Gagal mengambil data riwayat surat dari server.";
+    let payload;
 
     try {
-      const errorData = await response.json();
-      pesanError = errorData.message || pesanError;
+      payload = await response.json();
     } catch {
-      // Gunakan pesan default jika respons error bukan JSON.
+      payload = null;
     }
 
-    throw new Error(pesanError);
+    if (response.status === 401) {
+      clearSession();
+
+      if (!window.location.pathname.startsWith("/login")) {
+        window.location.assign("/login");
+      }
+    }
+
+    throw new Error(payload?.message || "Gagal memuat file template.");
   }
 
-  const result = await response.json();
-
-  // Mendukung respons berupa array langsung atau objek { data: [...] }.
-  const data = Array.isArray(result) ? result : result?.data;
-
-  if (!Array.isArray(data)) {
-    throw new Error("Format data riwayat surat dari server tidak valid.");
-  }
-
-  return data;
+  return response.blob();
 }

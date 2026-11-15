@@ -1,6 +1,7 @@
 
-import { Trash2 } from "lucide-react";
-function AdminTableRow({ admin, onDelete }) {
+import { Loader2, Pencil, UserCheck, UserX } from "lucide-react";
+
+function AdminTableRow({ admin, onEdit, onToggleStatus, isProcessing }) {
   const adminAktif = admin.status === "Aktif";
 
   return (
@@ -39,18 +40,39 @@ function AdminTableRow({ admin, onDelete }) {
       </td>
 
       <td className="px-6 py-4">
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => onEdit(admin)}
+            title="Edit admin"
+            aria-label={`Edit admin ${admin.name}`}
+            className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
 
-<button
-  type="button"
-  onClick={() => onDelete(admin.id)}
-  title="Hapus admin"
-  aria-label={`Hapus admin ${admin.name}`}
-  className="inline-flex items-center justify-center rounded-lg border border-slate-200 p-2 text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
->
-  <Trash2 className="h-4 w-4" />
-</button>
-
+          <button
+            type="button"
+            disabled={isProcessing}
+            onClick={() => onToggleStatus(admin)}
+            title={adminAktif ? "Nonaktifkan admin" : "Aktifkan admin"}
+            aria-label={`${
+              adminAktif ? "Nonaktifkan" : "Aktifkan"
+            } admin ${admin.name}`}
+            className={`inline-flex items-center justify-center rounded-lg border p-2 transition disabled:cursor-not-allowed disabled:opacity-60 ${
+              adminAktif
+                ? "border-slate-200 text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                : "border-slate-200 text-slate-500 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+            }`}
+          >
+            {isProcessing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : adminAktif ? (
+              <UserX className="h-4 w-4" />
+            ) : (
+              <UserCheck className="h-4 w-4" />
+            )}
+          </button>
         </div>
       </td>
     </tr>

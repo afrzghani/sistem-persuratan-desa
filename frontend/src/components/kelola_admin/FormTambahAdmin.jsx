@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { registerAdmin } from "../../services/authService";
+import { createAdmin } from "../../services/adminService";
 
 function FormTambahAdmin({ onSuccess, onCancel }) {
   const [name, setName] = useState("");
@@ -41,7 +41,7 @@ function FormTambahAdmin({ onSuccess, onCancel }) {
     setSedangMenyimpan(true);
 
     try {
-      await registerAdmin({
+      await createAdmin({
         name: name.trim(),
         email: email.trim(),
         password,

@@ -1,4 +1,5 @@
 
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 function WargaFormModal({
@@ -10,9 +11,10 @@ function WargaFormModal({
   handleSimpan,
   tutupForm,
 }) {
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-xl">
+      <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+        <div className="min-h-0 overflow-y-auto">
         {/* Header modal */}
         <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
           <div>
@@ -110,6 +112,25 @@ function WargaFormModal({
                 <option value="">Pilih jenis kelamin</option>
                 <option value="Laki-laki">Laki-laki</option>
                 <option value="Perempuan">Perempuan</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                Golongan Darah
+              </label>
+              <select
+                name="golonganDarah"
+                value={form.golonganDarah ?? ""}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Pilih golongan darah</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="AB">AB</option>
+                <option value="O">O</option>
+                <option value="-">-</option>
               </select>
             </div>
 
@@ -233,8 +254,10 @@ function WargaFormModal({
             </button>
           </div>
         </form>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

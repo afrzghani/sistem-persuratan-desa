@@ -1,15 +1,26 @@
 
+import { createPortal } from "react-dom";
 import { FileText, X } from "lucide-react";
 
-function DetailSuratModal({ suratDipilih, onTutup, formatTanggal }) {
+function DetailSuratModal({
+  suratDipilih,
+  onTutup,
+  formatTanggal,
+  onSelesaikan,
+  isFinalizing,
+  finalizeError,
+}) {
   if (!suratDipilih) return null;
+
+  const bisaDiselesaikan =
+    !suratDipilih.isDraft && suratDipilih.status !== "Selesai";
 
   const keperluan =
     suratDipilih.keperluan ||
     suratDipilih.dataPemohon?.purpose ||
     "-";
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
       onClick={onTutup}
@@ -112,17 +123,38 @@ function DetailSuratModal({ suratDipilih, onTutup, formatTanggal }) {
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        {finalizeError && (
+          <p
+            role="alert"
+            className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+          >
+            {finalizeError}
+          </p>
+        )}
+
+        <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
             onClick={onTutup}
-            className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
           >
             Tutup
           </button>
+
+          {bisaDiselesaikan && (
+            <button
+              type="button"
+              onClick={() => onSelesaikan(suratDipilih)}
+              disabled={isFinalizing}
+              className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isFinalizing ? "Menyelesaikan..." : "Tandai Selesai"}
+            </button>
+          )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

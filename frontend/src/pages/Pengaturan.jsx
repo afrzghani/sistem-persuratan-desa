@@ -1,252 +1,180 @@
+import { useEffect, useState } from "react";
 
-import { useState, useEffect } from 'react';
-
+import { useAuth } from "../hooks/useAuth";
+import ProfilAdmin from "../components/pengaturan/ProfilAdmin";
+import DataKepalaDesa from "../components/pengaturan/DataKepalaDesa";
 import {
+  changePassword,
   getAdminProfile,
   updateAdminProfile,
-  changePassword,
-} from '../services/profileService';
+} from "../services/profileService";
+import { getDesaSettings, updateDesaSettings } from "../services/desaService";
 
-import {
-  getDesaSettings,
-  updateDesaSettings,
-  uploadLogoDesa,
-} from '../services/desaService';
-
-import ProfilAdmin from '../components/pengaturan/ProfilAdmin';
-import InformasiDesa from '../components/pengaturan/InformasiDesa';
-import LogoDesa from '../components/pengaturan/LogoDesa';
-import DataKepalaDesa from '../components/pengaturan/DataKepalaDesa';
+function validateEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
 function Pengaturan() {
-  // State Profil Admin
-  const [adminName, setAdminName] = useState('');
-  const [adminEmail, setAdminEmail] = useState('');
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const { user, refreshUser } = useAuth();
 
-  // State Pengaturan Desa
-  const [namaDesa, setNamaDesa] = useState('');
-  const [kecamatan, setKecamatan] = useState('');
-  const [kabupaten, setKabupaten] = useState('');
-  const [alamatDesa, setAlamatDesa] = useState('');
-  const [logoPreview, setLogoPreview] = useState(null);
-  const [logoFile, setLogoFile] = useState(null);
-  const [namaKepalaDesa, setNamaKepalaDesa] = useState('');
-  const [jabatan, setJabatan] = useState('');
-
-  // State umum
   const [isLoading, setIsLoading] = useState(true);
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const [isSavingDesa, setIsSavingDesa] = useState(false);
-  const [isSavingLogo, setIsSavingLogo] = useState(false);
-  const [isSavingKepalaDesa, setIsSavingKepalaDesa] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('success');
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  // Ambil data ketika halaman pertama kali dibuka
+  const [adminName, setAdminName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const [namaKepalaDesa, setNamaKepalaDesa] = useState("");
+  const [jabatan, setJabatan] = useState("");
+  const [isSavingKepalaDesa, setIsSavingKepalaDesa] = useState(false);
+
   useEffect(() => {
-    async function loadData() {
+    let aktif = true;
+
+    async function muatPengaturan() {
       try {
         const [profile, desa] = await Promise.all([
           getAdminProfile(),
           getDesaSettings(),
         ]);
 
-        setAdminName(profile.name ?? '');
-        setAdminEmail(profile.email ?? '');
+        if (!aktif) return;
 
-        setNamaDesa(desa.namaDesa ?? '');
-        setKecamatan(desa.kecamatan ?? '');
-        setKabupaten(desa.kabupaten ?? '');
-        setAlamatDesa(desa.alamatDesa ?? '');
-        setLogoPreview(desa.logoUrl ?? null);
-        setNamaKepalaDesa(desa.namaKepalaDesa ?? '');
-        setJabatan(desa.jabatan ?? '');
+        setAdminName(profile.name || user?.name || "");
+        setAdminEmail(profile.email || user?.email || "");
+        setNamaKepalaDesa(desa.namaKepalaDesa || "");
+        setJabatan(desa.jabatan || "");
+        setError("");
       } catch (err) {
-        tampilkanPesan(
-          err.message || 'Gagal memuat data pengaturan.',
-          'error'
-        );
+        if (aktif) {
+          setError(err.message || "Gagal memuat pengaturan desa.");
+        }
       } finally {
-        setIsLoading(false);
+        if (aktif) {
+          setIsLoading(false);
+        }
       }
     }
 
-    loadData();
-  }, []);
+    muatPengaturan();
 
-  // Menampilkan pesan berhasil atau gagal
-  function tampilkanPesan(teks, tipe = 'success') {
-    setMessage(teks);
-    setMessageType(tipe);
-  }
+    return () => {
+      aktif = false;
+    };
+  }, [user?.name, user?.email]);
 
-  // Simpan profil admin
+  useEffect(() => {
+    if (!message) return undefined;
+
+    const timer = setTimeout(() => setMessage(""), 4000);
+    return () => clearTimeout(timer);
+  }, [message]);
+
   async function handleSaveProfile() {
+    setError("");
+    setMessage("");
+
+    if (!adminName.trim()) {
+      setError("Nama admin harus diisi.");
+      return;
+    }
+
+    if (!validateEmail(adminEmail)) {
+      setError("Format email tidak valid.");
+      return;
+    }
+
     setIsSavingProfile(true);
-    setMessage('');
 
     try {
-      await updateAdminProfile({
-        name: adminName,
-        email: adminEmail,
+      const profile = await updateAdminProfile({
+        name: adminName.trim(),
+        email: adminEmail.trim(),
       });
 
-      tampilkanPesan('Profil admin berhasil disimpan.');
+      setAdminName(profile.name);
+      setAdminEmail(profile.email);
+      setMessage("Profil berhasil diperbarui.");
+
+      if (refreshUser) {
+        await refreshUser();
+      }
     } catch (err) {
-      tampilkanPesan(
-        err.message || 'Gagal menyimpan profil admin.',
-        'error'
-      );
+      setError(err.message || "Gagal memperbarui profil.");
     } finally {
       setIsSavingProfile(false);
     }
   }
 
-  // Simpan informasi desa
-  async function handleSaveInformasiDesa() {
-    setIsSavingDesa(true);
-    setMessage('');
+  async function handleChangePassword(e) {
+    e.preventDefault();
+    setPasswordError("");
+    setError("");
+    setMessage("");
+
+    if (!currentPassword) {
+      setPasswordError("Password saat ini wajib diisi.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError("Password baru minimal 6 karakter.");
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("Konfirmasi password baru tidak cocok.");
+      return;
+    }
 
     try {
-      await updateDesaSettings({
-        namaDesa,
-        kecamatan,
-        kabupaten,
-        alamatDesa,
-      });
-
-      tampilkanPesan('Informasi desa berhasil disimpan.');
+      await changePassword({ currentPassword, newPassword });
+      setIsEditingPassword(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setMessage("Password berhasil diperbarui.");
     } catch (err) {
-      tampilkanPesan(
-        err.message || 'Gagal menyimpan informasi desa.',
-        'error'
-      );
-    } finally {
-      setIsSavingDesa(false);
+      setPasswordError(err.message || "Gagal memperbarui password.");
     }
   }
 
-  // Simpan data kepala desa
   async function handleSaveKepalaDesa() {
+    setError("");
+    setMessage("");
+
+    if (!namaKepalaDesa.trim() || !jabatan.trim()) {
+      setError("Nama dan jabatan kepala desa wajib diisi.");
+      return;
+    }
+
     setIsSavingKepalaDesa(true);
-    setMessage('');
 
     try {
-      await updateDesaSettings({
-        namaKepalaDesa,
-        jabatan,
+      const desa = await updateDesaSettings({
+        namaKepalaDesa: namaKepalaDesa.trim(),
+        jabatan: jabatan.trim(),
       });
 
-      tampilkanPesan('Data kepala desa berhasil disimpan.');
+      setNamaKepalaDesa(desa.namaKepalaDesa);
+      setJabatan(desa.jabatan);
+      setMessage("Data kepala desa berhasil diperbarui.");
     } catch (err) {
-      tampilkanPesan(
-        err.message || 'Gagal menyimpan data kepala desa.',
-        'error'
-      );
+      setError(err.message || "Gagal memperbarui data kepala desa.");
     } finally {
       setIsSavingKepalaDesa(false);
     }
   }
 
-  // Validasi dan simpan password
-  async function handleChangePassword(e) {
-    e.preventDefault();
-    setPasswordError('');
-
-    if (!currentPassword) {
-      setPasswordError('Password saat ini harus diisi.');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setPasswordError('Password baru minimal 6 karakter.');
-      return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-      setPasswordError('Konfirmasi password tidak cocok.');
-      return;
-    }
-
-    try {
-      await changePassword({
-        currentPassword,
-        newPassword,
-      });
-
-      setIsEditingPassword(false);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmNewPassword('');
-
-      tampilkanPesan('Password berhasil diubah.');
-    } catch (err) {
-      setPasswordError(err.message || 'Gagal mengubah password.');
-    }
-  }
-
-  // Pilih logo dan tampilkan preview
-  function handleLogoChange(e) {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    if (!['image/png', 'image/jpeg'].includes(file.type)) {
-      tampilkanPesan('Logo harus berformat JPG atau PNG.', 'error');
-      e.target.value = '';
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      tampilkanPesan('Ukuran logo maksimal 5 MB.', 'error');
-      e.target.value = '';
-      return;
-    }
-
-    setLogoFile(file);
-    setLogoPreview(URL.createObjectURL(file));
-    setMessage('');
-  }
-
-  // Simpan logo ketika tombol ditekan
-  async function handleSaveLogo() {
-    if (!logoFile) {
-      tampilkanPesan('Pilih logo baru terlebih dahulu.', 'error');
-      return;
-    }
-
-    setIsSavingLogo(true);
-    setMessage('');
-
-    try {
-      await uploadLogoDesa(logoFile);
-
-      setLogoFile(null);
-      tampilkanPesan('Logo desa berhasil disimpan.');
-    } catch (err) {
-      tampilkanPesan(
-        err.message || 'Gagal mengunggah logo desa.',
-        'error'
-      );
-    } finally {
-      setIsSavingLogo(false);
-    }
-  }
-
-  // Menampilkan indikator ketika data sedang dimuat
-  if (isLoading) {
-    return <p className="text-slate-400">Memuat data...</p>;
-  }
-
   return (
     <div className="min-h-full -m-6 bg-slate-50 px-6 py-8">
       <div className="mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="mb-1 flex items-center gap-2 text-sm">
             <span className="text-slate-500">Dashboard</span>
@@ -261,79 +189,64 @@ function Pengaturan() {
           </h2>
 
           <p className="mt-1 text-sm text-slate-500">
-            Kelola akun admin dan informasi desa.
+            Kelola profil akun, password, dan data kepala desa.
           </p>
         </div>
 
-        {/* Pesan status */}
+        {error && (
+          <div
+            role="alert"
+            className="mb-6 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {error}
+          </div>
+        )}
+
         {message && (
           <div
             role="status"
-            className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
-              messageType === 'error'
-                ? 'border-red-200 bg-red-50 text-red-700'
-                : 'border-emerald-100 bg-emerald-50 text-emerald-700'
-            }`}
+            className="mb-6 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
           >
             {message}
           </div>
         )}
 
-        <div className="space-y-6">
-          {/* PROFIL ADMIN */}
-          <ProfilAdmin
-            adminName={adminName}
-            setAdminName={setAdminName}
-            adminEmail={adminEmail}
-            setAdminEmail={setAdminEmail}
-            isEditingPassword={isEditingPassword}
-            setIsEditingPassword={setIsEditingPassword}
-            currentPassword={currentPassword}
-            setCurrentPassword={setCurrentPassword}
-            newPassword={newPassword}
-            setNewPassword={setNewPassword}
-            confirmNewPassword={confirmNewPassword}
-            setConfirmNewPassword={setConfirmNewPassword}
-            passwordError={passwordError}
-            setPasswordError={setPasswordError}
-            isSavingProfile={isSavingProfile}
-            handleSaveProfile={handleSaveProfile}
-            handleChangePassword={handleChangePassword}
-          />
+        {isLoading ? (
+          <div className="rounded-xl border border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-500">
+            Memuat pengaturan...
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <ProfilAdmin
+              adminName={adminName}
+              setAdminName={setAdminName}
+              adminEmail={adminEmail}
+              setAdminEmail={setAdminEmail}
+              isEditingPassword={isEditingPassword}
+              setIsEditingPassword={setIsEditingPassword}
+              currentPassword={currentPassword}
+              setCurrentPassword={setCurrentPassword}
+              newPassword={newPassword}
+              setNewPassword={setNewPassword}
+              confirmNewPassword={confirmNewPassword}
+              setConfirmNewPassword={setConfirmNewPassword}
+              passwordError={passwordError}
+              setPasswordError={setPasswordError}
+              isSavingProfile={isSavingProfile}
+              handleSaveProfile={handleSaveProfile}
+              handleChangePassword={handleChangePassword}
+            />
 
-          {/* INFORMASI DESA */}
-          <InformasiDesa
-            namaDesa={namaDesa}
-            setNamaDesa={setNamaDesa}
-            kecamatan={kecamatan}
-            setKecamatan={setKecamatan}
-            kabupaten={kabupaten}
-            setKabupaten={setKabupaten}
-            alamatDesa={alamatDesa}
-            setAlamatDesa={setAlamatDesa}
-            isSavingDesa={isSavingDesa}
-            handleSaveInformasiDesa={handleSaveInformasiDesa}
-          />
-
-          {/* LOGO DESA */}
-          <LogoDesa
-            logoPreview={logoPreview}
-            logoFile={logoFile}
-            handleLogoChange={handleLogoChange}
-            handleSaveLogo={handleSaveLogo}
-            isSavingLogo={isSavingLogo}
-          />
-
-          {/* DATA KEPALA DESA */}
-          <DataKepalaDesa
-            namaKepalaDesa={namaKepalaDesa}
-            setNamaKepalaDesa={setNamaKepalaDesa}
-            jabatan={jabatan}
-            setJabatan={setJabatan}
-            handleSaveKepalaDesa={handleSaveKepalaDesa}
-            isSavingKepalaDesa={isSavingKepalaDesa}
-          />
-        </div>
+            <DataKepalaDesa
+              namaKepalaDesa={namaKepalaDesa}
+              setNamaKepalaDesa={setNamaKepalaDesa}
+              jabatan={jabatan}
+              setJabatan={setJabatan}
+              handleSaveKepalaDesa={handleSaveKepalaDesa}
+              isSavingKepalaDesa={isSavingKepalaDesa}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

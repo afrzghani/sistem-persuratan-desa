@@ -102,7 +102,7 @@ function ProfilAdmin({
           ) : (
             <form
               onSubmit={handleChangePassword}
-              className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-5"
+              className="rounded-lg border border-slate-200 bg-slate-50 p-5"
             >
               <div className="mb-4">
                 <p className="text-sm font-semibold text-slate-700">
@@ -188,7 +188,7 @@ function ProfilAdmin({
                       setConfirmNewPassword('');
                       setPasswordError('');
                     }}
-                    className="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
+                    className="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors border border-slate-200 bg-white hover:bg-slate-100"
                   >
                     Batal
                   </button>

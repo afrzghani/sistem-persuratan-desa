@@ -1,36 +1,28 @@
-
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import WelcomeCard from "../components/dashboard/WelcomeCard";
 import QuickActions from "../components/dashboard/QuickActions";
 import DashboardStats from "../components/dashboard/DashboardStats";
-import RecentLetters from "../components/dashboard/RecentLetters";
+import ArsipSurat from "../components/riwayat/arsip/ArsipSurat";
 import CompletedLettersChart from "../components/dashboard/CompletedLettersChart";
 
-import { getRiwayatSurat } from "../services/templateService";
+import { getDashboard } from "../services/dashboardService";
 
-const namaBulan = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "Mei",
-  "Jun",
-  "Jul",
-  "Agu",
-  "Sep",
-  "Okt",
-  "Nov",
-  "Des",
-];
+const dashboardAwal = {
+  totalSurat: 0,
+  suratDiproses: 0,
+  suratSelesai: 0,
+  totalWarga: 0,
+  tahunTersedia: [],
+  suratTerbaru: [],
+  suratSelesaiBulanan: [],
+};
 
 function Dashboard() {
-  const tahunSekarang = new Date().getFullYear();
+  const tahunSekarang = String(new Date().getFullYear());
 
-  const [selectedYear, setSelectedYear] = useState(
-    String(tahunSekarang)
-  );
-  const [riwayatSurat, setRiwayatSurat] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(tahunSekarang);
+  const [dashboard, setDashboard] = useState(dashboardAwal);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -42,14 +34,12 @@ function Dashboard() {
         setIsLoading(true);
         setError("");
 
-        const data = await getRiwayatSurat();
+        const data = await getDashboard(selectedYear);
 
         if (isMounted) {
-          setRiwayatSurat(data);
+          setDashboard({ ...dashboardAwal, ...(data || {}) });
         }
       } catch (fetchError) {
-        console.error("Gagal mengambil data dashboard:", fetchError);
-
         if (isMounted) {
           setError(
             fetchError.message || "Gagal mengambil data dari server."
@@ -67,77 +57,12 @@ function Dashboard() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [selectedYear]);
 
-  const dashboard = useMemo(() => {
-    const suratSelesai = riwayatSurat.filter(
-      (surat) => surat.status?.toLowerCase() === "selesai"
-    );
-
-    const suratDiproses = riwayatSurat.filter(
-      (surat) => surat.status?.toLowerCase() === "diproses"
-    );
-
-    return {
-      totalSurat: riwayatSurat.length,
-      suratDiproses: suratDiproses.length,
-      suratSelesai: suratSelesai.length,
-      totalWarga: null,
-    };
-  }, [riwayatSurat]);
-
-  const suratTerbaru = useMemo(() => {
-    return [...riwayatSurat]
-      .sort(
-        (a, b) =>
-          new Date(b.tanggal).getTime() -
-          new Date(a.tanggal).getTime()
-      )
-      .slice(0, 5);
-  }, [riwayatSurat]);
-
-  const tahunTersedia = useMemo(() => {
-    const tahun = new Set([String(tahunSekarang)]);
-
-    riwayatSurat.forEach((surat) => {
-      if (surat.tanggal) {
-        const tanggal = new Date(surat.tanggal);
-
-        if (!Number.isNaN(tanggal.getTime())) {
-          tahun.add(String(tanggal.getFullYear()));
-        }
-      }
-    });
-
-    return [...tahun].sort((a, b) => Number(b) - Number(a));
-  }, [riwayatSurat, tahunSekarang]);
-
-  const suratSelesaiBulanan = useMemo(() => {
-    const jumlahPerBulan = Array(12).fill(0);
-
-    riwayatSurat.forEach((surat) => {
-      if (
-        surat.status?.toLowerCase() !== "selesai" ||
-        !surat.tanggal
-      ) {
-        return;
-      }
-
-      const tanggal = new Date(surat.tanggal);
-
-      if (
-        !Number.isNaN(tanggal.getTime()) &&
-        String(tanggal.getFullYear()) === selectedYear
-      ) {
-        jumlahPerBulan[tanggal.getMonth()] += 1;
-      }
-    });
-
-    return namaBulan.map((bulan, index) => ({
-      bulan,
-      jumlah: jumlahPerBulan[index],
-    }));
-  }, [riwayatSurat, selectedYear]);
+  const tahunTersedia =
+    dashboard.tahunTersedia?.length > 0
+      ? dashboard.tahunTersedia
+      : [tahunSekarang];
 
   return (
     <div className="space-y-8">
@@ -161,13 +86,7 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <QuickActions />
-
-        <DashboardStats
-          dashboard={{
-            ...dashboard,
-            totalWarga: dashboard.totalWarga ?? "—",
-          }}
-        />
+        <DashboardStats dashboard={dashboard} />
       </div>
 
       {isLoading ? (
@@ -176,10 +95,10 @@ function Dashboard() {
         </div>
       ) : (
         <>
-          <RecentLetters suratTerbaru={suratTerbaru} />
+          <ArsipSurat tampilkanLihatSemua />
 
           <CompletedLettersChart
-            data={suratSelesaiBulanan}
+            data={dashboard.suratSelesaiBulanan || []}
             selectedYear={selectedYear}
             tahunTersedia={tahunTersedia}
             onYearChange={setSelectedYear}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import logoDesa from "../assets/logodesa.png";
 
@@ -7,8 +7,10 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   //Regular Expression (Regex)----------------------
   function validateEmail(value) {
@@ -16,8 +18,9 @@ function Login() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
 
     if (!validateEmail(email)) {
       setError("Format email tidak valid");
@@ -28,11 +31,16 @@ function Login() {
       return;
     }
 
-    const success = login(email, password);
-    if (success) {
-      navigate("/dashboard");
-    } else {
-      setError("Email atau password salah");
+    setIsSubmitting(true);
+
+    try {
+      await login(email.trim(), password);
+      const tujuan = location.state?.from?.pathname || "/dashboard";
+      navigate(tujuan, { replace: true });
+    } catch (err) {
+      setError(err.message || "Email atau password salah");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -156,7 +164,7 @@ function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border border-slate-300 rounded-lg px-3 py-2 mb-4 outline-none focus:border-emerald-500"
-            placeholder="admin@desa.id"
+            placeholder="operator@gempolkurung.desa.id"
           />
 
           <label className="block text-sm font-medium text-slate-600 mb-1">
@@ -175,9 +183,10 @@ function Login() {
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+            disabled={isSubmitting}
+            className="w-full bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Masuk
+            {isSubmitting ? "Memproses..." : "Masuk"}
           </button>
         </form>
       </div>

@@ -1,7 +1,13 @@
 
 import AdminTableRow from "./AdminTableRow";
 
-function AdminTable({ admins, isLoading, onDelete }) {
+function AdminTable({
+  admins,
+  isLoading,
+  onEdit,
+  onToggleStatus,
+  processingId,
+}) {
   return (
     <section className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       <div className="px-6 py-5 border-b border-slate-100">
@@ -50,7 +56,9 @@ function AdminTable({ admins, isLoading, onDelete }) {
                 <AdminTableRow
                   key={admin.id}
                   admin={admin}
-                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onToggleStatus={onToggleStatus}
+                  isProcessing={processingId === admin.id}
                 />
               ))}
             </tbody>

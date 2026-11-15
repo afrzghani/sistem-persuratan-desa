@@ -1,46 +1,74 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Search, X, FileText, RefreshCw, AlertCircle } from "lucide-react";
 
 import { getTemplates } from "../../services/templateService";
 
-function LetterTypeSelector({ selectedType, onSelect }) {
+function sesuaikanTemplate(template) {
+  return {
+    id: String(template.id ?? template._id ?? ""),
+    kodeSurat: template.kodeSurat ?? "",
+    title:
+      template.namaSurat ??
+      template.namaTemplate ??
+      template.title ??
+      template.name ??
+      "Template tanpa nama",
+    description: template.deskripsi ?? template.description ?? "",
+  };
+}
+
+async function ambilTemplateSurat() {
+  const data = await getTemplates();
+
+  if (!Array.isArray(data)) {
+    throw new Error("Format data template dari server tidak valid.");
+  }
+
+  return data.map(sesuaikanTemplate).filter((template) => template.id);
+}
+
+function LetterTypeSelector({ selectedTemplate, onSelect }) {
   const [search, setSearch] = useState("");
   const [letterTypes, setLetterTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function muatTemplates() {
+  const muatTemplates = useCallback(async () => {
     try {
-      setLoading(true);
+      setLetterTypes(await ambilTemplateSurat());
       setError("");
-
-      const data = await getTemplates();
-
-      if (!Array.isArray(data)) {
-        throw new Error("Format data template dari server tidak valid.");
-      }
-
-      setLetterTypes(
-        data.map((template) => ({
-          id: String(template.id ?? template._id ?? ""),
-          title:
-            template.namaTemplate ??
-            template.title ??
-            template.name ??
-            "Template tanpa nama",
-          description: template.deskripsi ?? template.description ?? "",
-        })).filter((template) => template.id)
-      );
     } catch (err) {
       setError(err.message || "Gagal memuat jenis surat dari server.");
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    muatTemplates();
+    let aktif = true;
+
+    ambilTemplateSurat()
+      .then((data) => {
+        if (!aktif) return;
+
+        setLetterTypes(data);
+        setError("");
+      })
+      .catch((err) => {
+        if (aktif) {
+          setError(err.message || "Gagal memuat jenis surat dari server.");
+        }
+      })
+      .finally(() => {
+        if (aktif) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      aktif = false;
+    };
   }, []);
 
   const filteredLetterTypes = letterTypes.filter((letter) =>
@@ -138,7 +166,10 @@ function LetterTypeSelector({ selectedType, onSelect }) {
 
           <button
             type="button"
-            onClick={muatTemplates}
+            onClick={() => {
+              setLoading(true);
+              muatTemplates();
+            }}
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
           >
             <RefreshCw className="h-4 w-4" />
@@ -158,13 +189,14 @@ function LetterTypeSelector({ selectedType, onSelect }) {
             }`}
           >
             {filteredLetterTypes.map((letter) => {
-              const isSelected = selectedType === letter.id;
+              const isSelected =
+                String(selectedTemplate?.id ?? "") === letter.id;
 
               return (
                 <button
                   key={letter.id}
                   type="button"
-                  onClick={() => onSelect(letter.id)}
+                  onClick={() => onSelect(letter)}
                   aria-pressed={isSelected}
                   className={`relative min-h-[110px] rounded-xl border p-4 text-left transition ${
                     isSelected
