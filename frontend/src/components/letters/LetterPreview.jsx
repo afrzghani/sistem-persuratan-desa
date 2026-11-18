@@ -27,6 +27,7 @@ function LetterPreview({
   fileName,
   error,
   isCompleting,
+  templateFields = [],
   onBack,
   onComplete,
 }) {
@@ -148,6 +149,22 @@ function LetterPreview({
                   <span className="break-words">: {value || "-"}</span>
                 </div>
               ))}
+
+              {templateFields.length > 0 && formData.customData && (
+                <div className="mt-4 border-t border-dashed border-slate-200 pt-3">
+                  <p className="mb-2 font-semibold text-slate-700">Keterangan Tambahan:</p>
+                  {templateFields.map((field) => {
+                    const val = formData.customData?.[field.name];
+                    if (!val) return null;
+                    return (
+                      <div key={field.name} className="grid grid-cols-[140px_1fr] gap-2">
+                        <span>{field.label}</span>
+                        <span className="break-words">: {val}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               <p className="pt-3">
                 Surat ini dibuat untuk keperluan:{" "}

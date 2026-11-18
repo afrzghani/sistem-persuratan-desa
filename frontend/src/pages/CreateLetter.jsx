@@ -37,6 +37,7 @@ const initialFormData = {
   purpose: "",
   nomorSurat: "",
   keterangan: "",
+  customData: {},
 };
 
 const steps = ["Pilih jenis surat", "Unggah KTP", "Periksa data"];
@@ -111,6 +112,7 @@ function mapTemplateDraft(template) {
     kodeSurat: template.kodeSurat ?? "",
     title: template.namaSurat ?? "Template tanpa nama",
     description: template.deskripsi ?? "",
+    fields: template.fields ?? [],
   };
 }
 
@@ -259,6 +261,16 @@ function CreateLetter() {
     }));
   }
 
+  function handleCustomDataChange(fieldName, value) {
+    setFormData((previousData) => ({
+      ...previousData,
+      customData: {
+        ...(previousData.customData || {}),
+        [fieldName]: value,
+      },
+    }));
+  }
+
   async function handleProcessKTP() {
     if (!file) {
       setError("Silakan unggah foto KTP terlebih dahulu.");
@@ -340,6 +352,18 @@ function CreateLetter() {
       return;
     }
 
+    if (Array.isArray(selectedTemplate?.fields)) {
+      for (const field of selectedTemplate.fields) {
+        if (field.required) {
+          const val = formData.customData?.[field.name];
+          if (val === undefined || val === null || !String(val).trim()) {
+            setError(`Mohon lengkapi field ${field.label}.`);
+            return;
+          }
+        }
+      }
+    }
+
     setError("");
     setIsSubmitting(true);
 
@@ -351,6 +375,7 @@ function CreateLetter() {
         templateId: Number(selectedTemplate.id),
         nomorSurat: formData.nomorSurat.trim(),
         keperluan: formData.purpose.trim(),
+        customData: formData.customData || {},
       };
 
       if (formData.keterangan.trim()) {
@@ -418,6 +443,7 @@ function CreateLetter() {
           letterNumber={formData.nomorSurat}
           downloadUrl={generatedLetter?.downloadUrl}
           fileName={generatedLetter?.issuedLetter?.generatedFile}
+          templateFields={selectedTemplate?.fields || []}
           error={error}
           isCompleting={isCompleting}
           onBack={() => setShowPreview(false)}
@@ -575,6 +601,8 @@ function CreateLetter() {
                 formData={formData}
                 onChange={handleFormChange}
                 selectedTitle={selectedTemplate?.title}
+                templateFields={selectedTemplate?.fields || []}
+                onCustomDataChange={handleCustomDataChange}
               />
             </div>
 

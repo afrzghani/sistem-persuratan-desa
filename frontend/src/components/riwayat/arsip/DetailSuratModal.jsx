@@ -97,6 +97,26 @@ function DetailSuratModal({
             </p>
           </div>
 
+          {suratDipilih.customData &&
+            typeof suratDipilih.customData === "object" &&
+            Object.keys(suratDipilih.customData).length > 0 && (
+              <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                <p className="text-xs font-semibold text-slate-700">
+                  Data Tambahan
+                </p>
+                <div className="mt-2 space-y-1.5 text-xs">
+                  {Object.entries(suratDipilih.customData).map(([k, v]) => (
+                    <div key={k} className="grid grid-cols-[140px_1fr] gap-2">
+                      <span className="text-slate-500">{k.replace(/_/g, " ")}</span>
+                      <span className="break-words font-medium text-slate-800">
+                        {String(v || "-")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
           <div>
             <p className="text-xs text-slate-500">
               Tanggal Pengajuan

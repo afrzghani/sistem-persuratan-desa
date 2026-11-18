@@ -15,6 +15,7 @@ function sesuaikanTemplate(template) {
       template.name ??
       "Template tanpa nama",
     description: template.deskripsi ?? template.description ?? "",
+    fields: template.fields ?? [],
   };
 }
 
