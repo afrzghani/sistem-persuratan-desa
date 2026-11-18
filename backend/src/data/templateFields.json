@@ -1,0 +1,1040 @@
+{
+  "_comment": "Extra custom fields per kodeSurat. Only fields NOT auto-filled by the backend from resident KTP data. Each field name must match the exact docx template tag.",
+  "_auto_filled_by_backend": [
+    "No_Surat", "Kepala_Desa", "Tanggal_Surat", "Nama", "NIK", "Tempat", "Tanggal",
+    "Kelamin", "Agama", "Alamat", "RT", "RW", "Pekerjaan", "Status_Kawin",
+    "Status_Perkawinan", "Kewarganegaraan", "Golongan_Darah", "Keperluan", "Keterangan"
+  ],
+
+  "FPBK": {
+    "label": "Form Permohonan Bantuan KIS",
+    "fields": [
+      {
+        "name": "Nama_Istri",
+        "label": "Nama Istri",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap istri"
+      },
+      {
+        "name": "Nama_Anak1",
+        "label": "Nama Anak Pertama",
+        "type": "text",
+        "required": false,
+        "placeholder": "Kosongkan jika tidak ada"
+      },
+      {
+        "name": "Nama_Anak2",
+        "label": "Nama Anak Kedua",
+        "type": "text",
+        "required": false,
+        "placeholder": "Kosongkan jika tidak ada"
+      }
+    ]
+  },
+
+  "SPMK": {
+    "label": "Surat Pernyataan Miskin KIS",
+    "fields": [
+      {
+        "name": "Nama_Anak",
+        "label": "Nama Anak Tanggungan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap anak yang ditanggung"
+      }
+    ]
+  },
+
+  "SKBN": {
+    "label": "Surat Keterangan Beda Nama",
+    "fields": [
+      {
+        "name": "Dokumen_A",
+        "label": "Jenis Dokumen A",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: KTP, Ijazah, Akta Kelahiran"
+      },
+      {
+        "name": "Nama_A",
+        "label": "Nama yang Tertulis pada Dokumen A",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama sesuai dokumen A"
+      },
+      {
+        "name": "Dokumen_B",
+        "label": "Jenis Dokumen B",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Kartu Keluarga, BPJS, Paspor"
+      },
+      {
+        "name": "Nama_B",
+        "label": "Nama yang Tertulis pada Dokumen B",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama sesuai dokumen B"
+      }
+    ]
+  },
+
+  "SKBM": {
+    "label": "Surat Keterangan Belum Menikah",
+    "fields": []
+  },
+
+  "SKD": {
+    "label": "Surat Keterangan Domisili Warga",
+    "fields": []
+  },
+
+  "SKDL": {
+    "label": "Surat Keterangan Domisili Lembaga",
+    "fields": [
+      {
+        "name": "Jabatan",
+        "label": "Jabatan Pemohon di Lembaga",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Ketua, Sekretaris, Bendahara"
+      },
+      {
+        "name": "Alamat_Lembaga",
+        "label": "Alamat Lembaga",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap lembaga / organisasi"
+      }
+    ]
+  },
+
+  "SKDP": {
+    "label": "Surat Keterangan Domisili Perusahaan",
+    "fields": [
+      {
+        "name": "Nama_Perusahaan",
+        "label": "Nama Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap perusahaan"
+      },
+      {
+        "name": "Jenis_Usaha",
+        "label": "Jenis Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Perdagangan, Jasa, Manufaktur"
+      },
+      {
+        "name": "Alamat_Perusahaan",
+        "label": "Alamat Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap lokasi perusahaan"
+      },
+      {
+        "name": "Pimpinan_Perusahaan",
+        "label": "Nama Pimpinan Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama direktur atau pimpinan"
+      },
+      {
+        "name": "Jabatan",
+        "label": "Jabatan Pimpinan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Direktur Utama, Manager"
+      },
+      {
+        "name": "Nama_Notaris",
+        "label": "Nama Notaris",
+        "type": "text",
+        "required": false,
+        "placeholder": "Nama notaris (jika ada)"
+      },
+      {
+        "name": "Nomor_Notaris",
+        "label": "Nomor Akta Notaris",
+        "type": "text",
+        "required": false,
+        "placeholder": "Nomor akta notaris"
+      },
+      {
+        "name": "Tanggal_Notaris",
+        "label": "Tanggal Akta Notaris",
+        "type": "date",
+        "required": false,
+        "placeholder": ""
+      },
+      {
+        "name": "Akhir_Berlaku",
+        "label": "Tanggal Akhir Berlaku Surat",
+        "type": "date",
+        "required": false,
+        "placeholder": ""
+      }
+    ]
+  },
+
+  "SKDP2": {
+    "label": "Surat Keterangan Domisili Perusahaan (Variasi 2)",
+    "fields": [
+      {
+        "name": "Nama_Perusahaan",
+        "label": "Nama Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap perusahaan"
+      },
+      {
+        "name": "Jenis_Usaha",
+        "label": "Jenis Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Perdagangan, Jasa, Manufaktur"
+      },
+      {
+        "name": "Alamat_Perusahaan",
+        "label": "Alamat Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap lokasi perusahaan"
+      },
+      {
+        "name": "Pimpinan_Perusahaan",
+        "label": "Nama Pimpinan Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama direktur atau pimpinan"
+      },
+      {
+        "name": "Jabatan_Perusahaan",
+        "label": "Jabatan Pimpinan di Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Direktur Utama, Manager"
+      },
+      {
+        "name": "Akhir_Berlaku",
+        "label": "Tanggal Akhir Berlaku Surat",
+        "type": "date",
+        "required": false,
+        "placeholder": ""
+      }
+    ]
+  },
+
+  "SKDPN": {
+    "label": "Surat Keterangan Domisili Perusahaan Akta Notaris",
+    "fields": [
+      {
+        "name": "Nama_Perusahaan",
+        "label": "Nama Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap perusahaan"
+      },
+      {
+        "name": "Jenis_Usaha",
+        "label": "Jenis Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Perdagangan, Jasa, Manufaktur"
+      },
+      {
+        "name": "Alamat_Perusahaan",
+        "label": "Alamat Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap lokasi perusahaan"
+      },
+      {
+        "name": "Pimpinan_Perusahaan",
+        "label": "Nama Pimpinan Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama direktur atau pimpinan"
+      },
+      {
+        "name": "Jabatan_Perusahaan",
+        "label": "Jabatan Pimpinan di Perusahaan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Direktur Utama, Manager"
+      },
+      {
+        "name": "Akta_Pendirian",
+        "label": "Nomor Akta Pendirian",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nomor akta pendirian perusahaan"
+      },
+      {
+        "name": "Nama_Notaris",
+        "label": "Nama Notaris",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama notaris yang membuat akta"
+      },
+      {
+        "name": "Nomor_Notaris",
+        "label": "Nomor Akta Notaris",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nomor akta notaris"
+      },
+      {
+        "name": "Tanggal_Notaris",
+        "label": "Tanggal Akta Notaris",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Akhir_Berlaku",
+        "label": "Tanggal Akhir Berlaku Surat",
+        "type": "date",
+        "required": false,
+        "placeholder": ""
+      }
+    ]
+  },
+
+  "SKDS": {
+    "label": "Surat Keterangan Domisili Sekolah",
+    "fields": []
+  },
+
+  "SKDY": {
+    "label": "Surat Keterangan Domisili Yayasan",
+    "fields": [
+      {
+        "name": "Nama_Yayasan",
+        "label": "Nama Yayasan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap yayasan"
+      },
+      {
+        "name": "Pimpinan_Yayasan",
+        "label": "Nama Ketua / Pimpinan Yayasan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama ketua atau pimpinan yayasan"
+      },
+      {
+        "name": "Alamat_Yayasan",
+        "label": "Alamat Yayasan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap yayasan"
+      }
+    ]
+  },
+
+  "SKJU": {
+    "label": "Surat Keterangan Janda Umum",
+    "fields": []
+  },
+
+  "SKJCM": {
+    "label": "Surat Keterangan Janda Cerai Mati",
+    "fields": []
+  },
+
+  "SKKK": {
+    "label": "Surat Keterangan KK Baru",
+    "fields": []
+  },
+
+  "SKTM": {
+    "label": "Surat Keterangan Tidak Mampu",
+    "fields": [
+      {
+        "name": "No_KK",
+        "label": "Nomor Kartu Keluarga",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit nomor KK"
+      },
+      {
+        "name": "Camat_Menganti",
+        "label": "Nama Camat Menganti",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama camat Kecamatan Menganti"
+      },
+      {
+        "name": "Ket_Camat",
+        "label": "Jabatan Camat",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Camat Menganti"
+      },
+      {
+        "name": "NIP_Camat",
+        "label": "NIP Camat",
+        "type": "text",
+        "required": true,
+        "placeholder": "NIP camat Kecamatan Menganti"
+      }
+    ]
+  },
+
+  "SPMK2": {
+    "label": "Surat Pernyataan Miskin KIS (RT/RW)",
+    "fields": [
+      {
+        "name": "Ketua_RT",
+        "label": "Nama Ketua RT",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama ketua RT pemohon"
+      },
+      {
+        "name": "Ketua_RW",
+        "label": "Nama Ketua RW",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama ketua RW pemohon"
+      },
+      {
+        "name": "Ket_Camat",
+        "label": "Jabatan Camat",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Camat Menganti"
+      },
+      {
+        "name": "NIP_Camat",
+        "label": "NIP Camat",
+        "type": "text",
+        "required": true,
+        "placeholder": "NIP camat Kecamatan Menganti"
+      }
+    ]
+  },
+
+  "SKKU": {
+    "label": "Surat Keterangan Keringanan UKT",
+    "fields": [
+      {
+        "name": "No_KK",
+        "label": "Nomor Kartu Keluarga",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit nomor KK"
+      },
+      {
+        "name": "Nama_Anak",
+        "label": "Nama Mahasiswa (Anak)",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap anak / mahasiswa"
+      },
+      {
+        "name": "NIK_Anak",
+        "label": "NIK Mahasiswa",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit NIK mahasiswa"
+      },
+      {
+        "name": "Kelamin_Anak",
+        "label": "Jenis Kelamin Mahasiswa",
+        "type": "select",
+        "required": true,
+        "placeholder": "",
+        "options": ["Laki-laki", "Perempuan"]
+      },
+      {
+        "name": "Tempat_Anak",
+        "label": "Tempat Lahir Mahasiswa",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir mahasiswa"
+      },
+      {
+        "name": "Tanggal_Anak",
+        "label": "Tanggal Lahir Mahasiswa",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Universitas_Anak",
+        "label": "Nama Universitas / Perguruan Tinggi",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Universitas Airlangga"
+      }
+    ]
+  },
+
+  "SKTMS": {
+    "label": "Surat Keterangan Tidak Mampu Sekolah",
+    "fields": [
+      {
+        "name": "No_KK",
+        "label": "Nomor Kartu Keluarga",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit nomor KK"
+      },
+      {
+        "name": "Nama_Anak",
+        "label": "Nama Anak / Siswa",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap anak / siswa"
+      },
+      {
+        "name": "Kelamin_Anak",
+        "label": "Jenis Kelamin Anak",
+        "type": "select",
+        "required": true,
+        "placeholder": "",
+        "options": ["Laki-laki", "Perempuan"]
+      },
+      {
+        "name": "Tempat_Anak",
+        "label": "Tempat Lahir Anak",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir anak"
+      },
+      {
+        "name": "Tanggal_Anak",
+        "label": "Tanggal Lahir Anak",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Sekolah_Anak",
+        "label": "Nama Sekolah",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: SMA Negeri 1 Menganti"
+      }
+    ]
+  },
+
+  "SKNP": {
+    "label": "Surat Keterangan Nadzir Perseorangan",
+    "fields": [
+      {
+        "name": "Masjid",
+        "label": "Nama Masjid / Musholla",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama masjid atau musholla"
+      },
+      {
+        "name": "Dusun",
+        "label": "Nama Dusun",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama dusun lokasi masjid"
+      },
+      {
+        "name": "Nama_Ketua",
+        "label": "Nama Ketua Nadzir",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap ketua nadzir"
+      },
+      {
+        "name": "NIK_Ketua",
+        "label": "NIK Ketua",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit NIK ketua nadzir"
+      },
+      {
+        "name": "Tempat_Ketua",
+        "label": "Tempat Lahir Ketua",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir ketua"
+      },
+      {
+        "name": "Tanggal_Ketua",
+        "label": "Tanggal Lahir Ketua",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Umur_Ketua",
+        "label": "Umur Ketua (tahun)",
+        "type": "number",
+        "required": true,
+        "placeholder": "Contoh: 45"
+      },
+      {
+        "name": "Pekerjaan_Ketua",
+        "label": "Pekerjaan Ketua",
+        "type": "text",
+        "required": true,
+        "placeholder": "Pekerjaan ketua nadzir"
+      },
+      {
+        "name": "TempatTinggal_Ketua",
+        "label": "Alamat Tempat Tinggal Ketua",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap ketua nadzir"
+      },
+      {
+        "name": "Nama_Sekretaris",
+        "label": "Nama Sekretaris Nadzir",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap sekretaris nadzir"
+      },
+      {
+        "name": "NIK_Sekretaris",
+        "label": "NIK Sekretaris",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit NIK sekretaris"
+      },
+      {
+        "name": "Tempat_Sekretaris",
+        "label": "Tempat Lahir Sekretaris",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir sekretaris"
+      },
+      {
+        "name": "Tanggal_Sekretaris",
+        "label": "Tanggal Lahir Sekretaris",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Umur_Sekretaris",
+        "label": "Umur Sekretaris (tahun)",
+        "type": "number",
+        "required": true,
+        "placeholder": "Contoh: 38"
+      },
+      {
+        "name": "Pekerjaan_Sekretaris",
+        "label": "Pekerjaan Sekretaris",
+        "type": "text",
+        "required": true,
+        "placeholder": "Pekerjaan sekretaris nadzir"
+      },
+      {
+        "name": "TempatTinggal_Sekretaris",
+        "label": "Alamat Tempat Tinggal Sekretaris",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap sekretaris"
+      },
+      {
+        "name": "Nama_Bendahara",
+        "label": "Nama Bendahara Nadzir",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap bendahara nadzir"
+      },
+      {
+        "name": "NIK_Bendahara",
+        "label": "NIK Bendahara",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit NIK bendahara"
+      },
+      {
+        "name": "Tempat_Bendahara",
+        "label": "Tempat Lahir Bendahara",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir bendahara"
+      },
+      {
+        "name": "Tanggal_Bendahara",
+        "label": "Tanggal Lahir Bendahara",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Umur_Bendahara",
+        "label": "Umur Bendahara (tahun)",
+        "type": "number",
+        "required": true,
+        "placeholder": "Contoh: 42"
+      },
+      {
+        "name": "Pekerjaan_Bendahara",
+        "label": "Pekerjaan Bendahara",
+        "type": "text",
+        "required": true,
+        "placeholder": "Pekerjaan bendahara nadzir"
+      },
+      {
+        "name": "TempatTinggal_Bendahara",
+        "label": "Alamat Tempat Tinggal Bendahara",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap bendahara"
+      },
+      {
+        "name": "Nama_Anggota",
+        "label": "Nama Anggota Nadzir",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap anggota nadzir"
+      },
+      {
+        "name": "NIK_Anggota",
+        "label": "NIK Anggota",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit NIK anggota"
+      },
+      {
+        "name": "Tempat_Anggota",
+        "label": "Tempat Lahir Anggota",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir anggota"
+      },
+      {
+        "name": "Tanggal_Anggota",
+        "label": "Tanggal Lahir Anggota",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Umur_Anggota",
+        "label": "Umur Anggota (tahun)",
+        "type": "number",
+        "required": true,
+        "placeholder": "Contoh: 35"
+      },
+      {
+        "name": "Pekerjaan_Anggota",
+        "label": "Pekerjaan Anggota",
+        "type": "text",
+        "required": true,
+        "placeholder": "Pekerjaan anggota nadzir"
+      },
+      {
+        "name": "TempatTinggal_Anggota",
+        "label": "Alamat Tempat Tinggal Anggota",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap anggota"
+      }
+    ]
+  },
+
+  "SKPBU": {
+    "label": "Surat Keterangan Penghasilan Banding UKT",
+    "fields": [
+      {
+        "name": "Status",
+        "label": "Status Perkawinan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Kawin, Belum Kawin, Duda/Janda"
+      },
+      {
+        "name": "Penghasilan",
+        "label": "Penghasilan per Bulan",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Rp 2.500.000"
+      },
+      {
+        "name": "Universitas",
+        "label": "Nama Universitas / Perguruan Tinggi",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Universitas Airlangga"
+      }
+    ]
+  },
+
+  "SPL": {
+    "label": "Surat Pengesahan Lembaga",
+    "fields": [
+      {
+        "name": "Lembaga",
+        "label": "Nama Lembaga",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap lembaga"
+      },
+      {
+        "name": "Tanggal_Lembaga",
+        "label": "Tanggal Berdiri / Tanggal Lembaga",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Alamat_Lembaga",
+        "label": "Alamat Lembaga",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap lembaga"
+      },
+      {
+        "name": "Ketua",
+        "label": "Nama Ketua Lembaga",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama ketua lembaga"
+      },
+      {
+        "name": "Alamat_Ketua",
+        "label": "Alamat Ketua Lembaga",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat tempat tinggal ketua"
+      },
+      {
+        "name": "Camat_Menganti",
+        "label": "Nama Camat Menganti",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama camat Kecamatan Menganti"
+      },
+      {
+        "name": "NIP_Camat",
+        "label": "NIP Camat",
+        "type": "text",
+        "required": true,
+        "placeholder": "NIP camat Kecamatan Menganti"
+      }
+    ]
+  },
+
+  "SKJMC": {
+    "label": "Surat Keterangan Janda Mati CPNS",
+    "fields": []
+  },
+
+  "SKBD": {
+    "label": "Surat Keterangan Bersih Diri",
+    "fields": [
+      {
+        "name": "No_KK",
+        "label": "Nomor Kartu Keluarga",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit nomor KK"
+      },
+      {
+        "name": "Dusun",
+        "label": "Nama Dusun",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama dusun tempat tinggal"
+      },
+      {
+        "name": "Tujuan",
+        "label": "Tujuan Pembuatan Surat",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: melamar pekerjaan, mendaftar CPNS"
+      }
+    ]
+  },
+
+  "SKUD": {
+    "label": "Surat Keterangan Usaha Domisili",
+    "fields": [
+      {
+        "name": "Umur",
+        "label": "Umur Pemohon (tahun)",
+        "type": "number",
+        "required": true,
+        "placeholder": "Contoh: 35"
+      },
+      {
+        "name": "Usaha",
+        "label": "Jenis / Nama Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Warung Makan Barokah"
+      },
+      {
+        "name": "Alamat_Usaha",
+        "label": "Alamat Lokasi Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap lokasi usaha"
+      }
+    ]
+  },
+
+  "SKU": {
+    "label": "Surat Keterangan Usaha",
+    "fields": [
+      {
+        "name": "Umur",
+        "label": "Umur Pemohon (tahun)",
+        "type": "number",
+        "required": true,
+        "placeholder": "Contoh: 35"
+      },
+      {
+        "name": "Usaha",
+        "label": "Jenis / Nama Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Pedagang Kelontong"
+      }
+    ]
+  },
+
+  "SKDU": {
+    "label": "Surat Keterangan Domisili Usaha",
+    "fields": [
+      {
+        "name": "Usaha",
+        "label": "Nama Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama usaha / bisnis"
+      },
+      {
+        "name": "Pimpinan",
+        "label": "Nama Pimpinan Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama pemilik atau pimpinan usaha"
+      },
+      {
+        "name": "Alamat_Pimpinan",
+        "label": "Alamat Pimpinan Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat tempat tinggal pimpinan"
+      },
+      {
+        "name": "Bidang_Usaha",
+        "label": "Bidang Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Perdagangan, Jasa, Kuliner"
+      },
+      {
+        "name": "Alamat_Usaha",
+        "label": "Alamat Lokasi Usaha",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap lokasi usaha"
+      }
+    ]
+  },
+
+  "SKW": {
+    "label": "Surat Keterangan Wali",
+    "fields": [
+      {
+        "name": "Nama_Wali",
+        "label": "Nama Wali",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap wali"
+      },
+      {
+        "name": "NIK_Wali",
+        "label": "NIK Wali",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit NIK wali"
+      },
+      {
+        "name": "Tempat_Wali",
+        "label": "Tempat Lahir Wali",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir wali"
+      },
+      {
+        "name": "Tanggal_Wali",
+        "label": "Tanggal Lahir Wali",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Pekerjaan_Wali",
+        "label": "Pekerjaan Wali",
+        "type": "text",
+        "required": true,
+        "placeholder": "Pekerjaan wali"
+      },
+      {
+        "name": "Alamat_Wali",
+        "label": "Alamat Wali",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap wali"
+      },
+      {
+        "name": "Status_Wali",
+        "label": "Hubungan Wali dengan Calon Mempelai",
+        "type": "text",
+        "required": true,
+        "placeholder": "Contoh: Ayah Kandung, Paman"
+      },
+      {
+        "name": "Nama_Mempelai",
+        "label": "Nama Calon Mempelai",
+        "type": "text",
+        "required": true,
+        "placeholder": "Nama lengkap calon mempelai"
+      },
+      {
+        "name": "NIK_Mempelai",
+        "label": "NIK Calon Mempelai",
+        "type": "text",
+        "required": true,
+        "placeholder": "16 digit NIK calon mempelai"
+      },
+      {
+        "name": "Tempat_Mempelai",
+        "label": "Tempat Lahir Calon Mempelai",
+        "type": "text",
+        "required": true,
+        "placeholder": "Kota tempat lahir calon mempelai"
+      },
+      {
+        "name": "Tanggal_Mempelai",
+        "label": "Tanggal Lahir Calon Mempelai",
+        "type": "date",
+        "required": true,
+        "placeholder": ""
+      },
+      {
+        "name": "Pekerjaan_Mempelai",
+        "label": "Pekerjaan Calon Mempelai",
+        "type": "text",
+        "required": true,
+        "placeholder": "Pekerjaan calon mempelai"
+      },
+      {
+        "name": "Alamat_Mempelai",
+        "label": "Alamat Calon Mempelai",
+        "type": "text",
+        "required": true,
+        "placeholder": "Alamat lengkap calon mempelai"
+      }
+    ]
+  }
+}

@@ -38,163 +38,163 @@ async function main() {
     {
       kodeSurat: 'SKTM',
       namaSurat: 'Surat Keterangan Tidak Mampu',
-      templateFile: 'JA_SURAT KETERANGAN MISKIN KIS.docx',
+      templateFile: 'SKTM_SURAT KETERANGAN MISKIN KIS.docx',
       deskripsi: 'Surat keterangan untuk keperluan beasiswa, keringanan biaya RS, atau bantuan sosial.'
     },
     {
       kodeSurat: 'SKU',
       namaSurat: 'Surat Keterangan Usaha',
-      templateFile: 'NA_SURAT KETERANGAN USAHA.docx',
+      templateFile: 'SKU_SURAT KETERANGAN USAHA.docx',
       deskripsi: 'Surat keterangan kepemilikan usaha mikro/kecil warga desa.'
     },
     {
       kodeSurat: 'SKD',
       namaSurat: 'Surat Keterangan Domisili',
-      templateFile: 'DA_SURAT KETERANGAN DOMISILI WARGA.docx',
+      templateFile: 'SKD_SURAT KETERANGAN DOMISILI WARGA.docx',
       deskripsi: 'Surat keterangan tempat tinggal / domisili warga di Desa Gempolkurung.'
     },
     {
       kodeSurat: 'SKBM',
       namaSurat: 'Surat Keterangan Belum Menikah',
-      templateFile: 'C_SURAT KETERANGAN BELUM MENIKAH.docx',
+      templateFile: 'SKBM_SURAT KETERANGAN BELUM MENIKAH.docx',
       deskripsi: 'Surat keterangan belum pernah menikah (jejaka / perawan) warga desa.'
     },
     {
       kodeSurat: 'FPBK',
       namaSurat: 'Form Permohonan Bantuan KIS',
-      templateFile: 'AA_FORM PERMOHONAN BANTUAN KIS.docx',
+      templateFile: 'FPBK_FORM PERMOHONAN BANTUAN KIS.docx',
       deskripsi: 'Formulir permohonan bantuan Kartu Indonesia Sehat (KIS).'
     },
     {
       kodeSurat: 'SPMK',
       namaSurat: 'Surat Pernyataan Miskin KIS',
-      templateFile: 'AB_SURAT PERNYATAAN MISKIN KIS.docx',
+      templateFile: 'SPMK_SURAT PERNYATAAN MISKIN KIS.docx',
       deskripsi: 'Surat pernyataan tidak mampu untuk pengajuan KIS.'
     },
     {
       kodeSurat: 'SKBN',
       namaSurat: 'Surat Keterangan Beda Nama',
-      templateFile: 'B_SURAT-KETERANGAN-BEDA-NAMA.docx',
+      templateFile: 'SKBN_SURAT KETERANGAN BEDA NAMA.docx',
       deskripsi: 'Surat keterangan perbedaan data nama pada dokumen kependudukan.'
     },
     {
       kodeSurat: 'SKDL',
       namaSurat: 'Surat Keterangan Domisili Lembaga',
-      templateFile: 'DB_SURAT KETERANGAN DOMISILI LEMBAGA.docx',
+      templateFile: 'SKDL_SURAT KETERANGAN DOMISILI LEMBAGA.docx',
       deskripsi: 'Surat keterangan domisili untuk lembaga atau organisasi.'
     },
     {
       kodeSurat: 'SKDP',
       namaSurat: 'Surat Keterangan Domisili Perusahaan',
-      templateFile: 'DC_SURAT KETERANGAN DOMISILI PERUSAHAAN.docx',
+      templateFile: 'SKDP_SURAT KETERANGAN DOMISILI PERUSAHAAN.docx',
       deskripsi: 'Surat keterangan domisili perusahaan.'
     },
     {
       kodeSurat: 'SKDP2',
       namaSurat: 'Surat Keterangan Domisili Perusahaan (Variasi 2)',
-      templateFile: 'EA_SURAT KETERANGAN DOMISILI PERUSAHAAN.docx',
+      templateFile: 'SKDP2_SURAT KETERANGAN DOMISILI PERUSAHAAN.docx',
       deskripsi: 'Surat keterangan domisili perusahaan versi kedua.'
     },
     {
       kodeSurat: 'SKDPN',
       namaSurat: 'Surat Keterangan Domisili Perusahaan Akta Notaris',
-      templateFile: 'EB_SURAT KETERANGAN DOMISILI PERUSAHAAN AKTA NOTARIS.docx',
+      templateFile: 'SKDPN_SURAT KETERANGAN DOMISILI PERUSAHAAN AKTA NOTARIS.docx',
       deskripsi: 'Surat keterangan domisili perusahaan dengan akta notaris.'
     },
     {
       kodeSurat: 'SKDS',
       namaSurat: 'Surat Keterangan Domisili Sekolah',
-      templateFile: 'F_SURAT KETERANGAN DOMISILI SEKOLAH.docx',
+      templateFile: 'SKDS_SURAT KETERANGAN DOMISILI SEKOLAH.docx',
       deskripsi: 'Surat keterangan domisili sekolah.'
     },
     {
       kodeSurat: 'SKDY',
       namaSurat: 'Surat Keterangan Domisili Yayasan',
-      templateFile: 'G_SURAT KETERANGAN DOMISILI YAYASAN.docx',
+      templateFile: 'SKDY_SURAT KETERANGAN DOMISILI YAYASAN.docx',
       deskripsi: 'Surat keterangan domisili yayasan.'
     },
     {
       kodeSurat: 'SKJU',
       namaSurat: 'Surat Keterangan Janda Umum',
-      templateFile: 'HA_SURAT KETERANGAN JANDA UMUM.docx',
+      templateFile: 'SKJU_SURAT KETERANGAN JANDA UMUM.docx',
       deskripsi: 'Surat keterangan janda umum.'
     },
     {
       kodeSurat: 'SKJCM',
       namaSurat: 'Surat Keterangan Janda Cerai Mati',
-      templateFile: 'HB_SURAT KETERANGAN JANDA CERAI MATI.docx',
+      templateFile: 'SKJCM_SURAT KETERANGAN JANDA CERAI MATI.docx',
       deskripsi: 'Surat keterangan janda karena cerai mati.'
     },
     {
       kodeSurat: 'SKKK',
       namaSurat: 'Surat Keterangan KK Baru',
-      templateFile: 'I_SURAT KETERANGAN KK BARU.docx',
+      templateFile: 'SKKK_SURAT KETERANGAN KK BARU.docx',
       deskripsi: 'Surat keterangan pembuatan Kartu Keluarga baru.'
     },
     {
       kodeSurat: 'SPMK2',
       namaSurat: 'Surat Pernyataan Miskin KIS (RT/RW)',
-      templateFile: 'JB_SURAT PERNYATAAN MISKIN KIS.docx',
+      templateFile: 'SPMK2_SURAT PERNYATAAN MISKIN KIS.docx',
       deskripsi: 'Surat pernyataan miskin KIS dengan pengesahan RT/RW.'
     },
     {
       kodeSurat: 'SKKU',
       namaSurat: 'Surat Keterangan Keringanan UKT',
-      templateFile: 'KA_SURAT KETERANGAN KERINGANAN UKT.docx',
+      templateFile: 'SKKU_SURAT KETERANGAN KERINGANAN UKT.docx',
       deskripsi: 'Surat keterangan keringanan Uang Kuliah Tunggal (UKT).'
     },
     {
       kodeSurat: 'SKTMS',
       namaSurat: 'Surat Keterangan Tidak Mampu Sekolah',
-      templateFile: 'KB_SURAT KETERANGAN TIDAK MAMPU SEKOLAH.docx',
+      templateFile: 'SKTMS_SURAT KETERANGAN TIDAK MAMPU SEKOLAH.docx',
       deskripsi: 'Surat keterangan tidak mampu untuk keperluan sekolah.'
     },
     {
       kodeSurat: 'SKNP',
       namaSurat: 'Surat Keterangan Nadzir Perseorangan',
-      templateFile: 'LA_SURAT KETERANGAN NADZIR PERSEORANGAN.docx',
+      templateFile: 'SKNP_SURAT KETERANGAN NADZIR PERSEORANGAN.docx',
       deskripsi: 'Surat keterangan nadzir perseorangan.'
     },
     {
       kodeSurat: 'SKPBU',
       namaSurat: 'Surat Keterangan Penghasilan Banding UKT',
-      templateFile: 'LB_SURAT KETERANGAN PENGHASILAN BANDING UKT.docx',
+      templateFile: 'SKPBU_SURAT KETERANGAN PENGHASILAN BANDING UKT.docx',
       deskripsi: 'Surat keterangan penghasilan untuk banding UKT.'
     },
     {
       kodeSurat: 'SPL',
       namaSurat: 'Surat Pengesahan Lembaga',
-      templateFile: 'LC_PENGESAHAN LEMBAGA.docx',
+      templateFile: 'SPL_PENGESAHAN LEMBAGA.docx',
       deskripsi: 'Surat pengesahan lembaga.'
     },
     {
       kodeSurat: 'SKJMC',
       namaSurat: 'Surat Keterangan Janda Mati CPNS',
-      templateFile: 'LD_SURAT KETERANGAN JANDA MATI CPNS.docx',
+      templateFile: 'SKJMC_SURAT KETERANGAN JANDA MATI CPNS.docx',
       deskripsi: 'Surat keterangan janda mati untuk keperluan CPNS.'
     },
     {
       kodeSurat: 'SKBD',
       namaSurat: 'Surat Keterangan Bersih Diri',
-      templateFile: 'LE_SURAT KETERANGAN BERSIH DIRI.docx',
+      templateFile: 'SKBD_SURAT KETERANGAN BERSIH DIRI.docx',
       deskripsi: 'Surat keterangan bersih diri.'
     },
     {
       kodeSurat: 'SKUD',
       namaSurat: 'Surat Keterangan Usaha Domisili',
-      templateFile: 'M_SURAT-KETERANGAN-USAHA-DOMISILI.docx',
+      templateFile: 'SKUD_SURAT KETERANGAN USAHA DOMISILI.docx',
       deskripsi: 'Surat keterangan usaha dan domisili.'
     },
     {
       kodeSurat: 'SKDU',
       namaSurat: 'Surat Keterangan Domisili Usaha',
-      templateFile: 'NB_SURAT KETERANGAN DOMISILI USAHA.docx',
+      templateFile: 'SKDU_SURAT KETERANGAN DOMISILI USAHA.docx',
       deskripsi: 'Surat keterangan domisili usaha.'
     },
     {
       kodeSurat: 'SKW',
       namaSurat: 'Surat Keterangan Wali',
-      templateFile: 'O_SURAT-KETERANGAN-WALI.docx',
+      templateFile: 'SKW_SURAT KETERANGAN WALI.docx',
       deskripsi: 'Surat keterangan wali.'
     }
   ];

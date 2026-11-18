@@ -82,6 +82,7 @@ model IssuedLetter {
   operatorId    Int
   operator      User           @relation(fields: [operatorId], references: [id], onDelete: Restrict)
   keperluan     String         @db.Text
+  customData    Json?
   generatedFile String?
   status        String         @default("Proses")
   issuedAt      DateTime       @default(now())

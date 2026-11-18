@@ -8,6 +8,7 @@ import { AuthenticatedRequest } from '../types/index.js';
 import { generateDocumentFromTemplate, LetterTemplateVariables } from '../services/docxtemplaterService.js';
 import { getOrCreateDesaSettings } from '../services/desaSettingsService.js';
 import { successResponse, errorResponse } from '../utils/response.js';
+import templateFieldsData from '../data/templateFields.json';
 
 const DESA_IDENTITY = {
   namaDesa: 'Gempolkurung',
@@ -52,7 +53,16 @@ export const listTemplates = async (_req: AuthenticatedRequest, res: Response, n
       where: { isActive: true },
       orderBy: { namaSurat: 'asc' }
     });
-    successResponse(res, 'Daftar template surat berhasil dimuat.', templates);
+
+    const enrichedTemplates = templates.map((t) => {
+      const fieldConfig = (templateFieldsData as Record<string, any>)[t.kodeSurat];
+      return {
+        ...t,
+        fields: fieldConfig?.fields || []
+      };
+    });
+
+    successResponse(res, 'Daftar template surat berhasil dimuat.', enrichedTemplates);
   } catch (err) {
     next(err);
   }
@@ -316,6 +326,7 @@ export const issueLetter = async (
           templateId: template.id,
           operatorId: req.user.userId,
           keperluan: validated.keperluan,
+          customData: (validated.customData as Prisma.InputJsonValue) ?? Prisma.JsonNull,
           generatedFile: outputFileName,
           status: 'Proses'
         },
