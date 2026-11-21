@@ -97,26 +97,6 @@ function DetailSuratModal({
             </p>
           </div>
 
-          {suratDipilih.customData &&
-            typeof suratDipilih.customData === "object" &&
-            Object.keys(suratDipilih.customData).length > 0 && (
-              <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
-                <p className="text-xs font-semibold text-slate-700">
-                  Data Tambahan
-                </p>
-                <div className="mt-2 space-y-1.5 text-xs">
-                  {Object.entries(suratDipilih.customData).map(([k, v]) => (
-                    <div key={k} className="grid grid-cols-[140px_1fr] gap-2">
-                      <span className="text-slate-500">{k.replace(/_/g, " ")}</span>
-                      <span className="break-words font-medium text-slate-800">
-                        {String(v || "-")}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
           <div>
             <p className="text-xs text-slate-500">
               Tanggal Pengajuan
@@ -132,12 +112,19 @@ function DetailSuratModal({
             </p>
 
             <span
-              className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+              className={`mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
                 suratDipilih.status === "Selesai"
                   ? "bg-emerald-50 text-emerald-700"
                   : "bg-amber-50 text-amber-700"
               }`}
             >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  suratDipilih.status === "Selesai"
+                    ? "bg-emerald-500"
+                    : "bg-amber-500"
+                }`}
+              />
               {suratDipilih.status || "Belum diketahui"}
             </span>
           </div>

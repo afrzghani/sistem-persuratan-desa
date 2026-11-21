@@ -5,6 +5,7 @@ import imageCompression from "browser-image-compression";
 
 import LetterTypeSelector from "../components/letters/LetterTypeSelector";
 import KTPUploader from "../components/letters/KTPUploader";
+import ResidentPicker from "../components/letters/ResidentPicker";
 import ApplicantForm from "../components/letters/ApplicantForm";
 import LetterDetailsForm from "../components/letters/LetterDetailsForm";
 import LetterPreview from "../components/letters/LetterPreview";
@@ -305,6 +306,18 @@ function CreateLetter() {
     setStep(3);
   }
 
+  function handleSelectResident(resident) {
+    setError("");
+    removeFile();
+
+    setFormData((previousData) => ({
+      ...previousData,
+      ...mapProfile(resident),
+    }));
+
+    setStep(3);
+  }
+
   async function handleKembaliPilihTemplate() {
     setStep(1);
     setSelectedTemplate(null);
@@ -576,17 +589,26 @@ function CreateLetter() {
         )}
 
         {step === 2 && (
-          <KTPUploader
-            file={file}
-            preview={preview}
-            error={error}
-            onFileChange={handleFile}
-            onRemove={removeFile}
-            onProcess={handleProcessKTP}
-            onSkip={handleSkipOcr}
-            onBack={handleKembaliPilihTemplate}
-            isProcessing={isProcessing}
-          />
+          <>
+            <ResidentPicker
+              onSelect={handleSelectResident}
+              disabled={isProcessing}
+            />
+
+            <div className="mt-6">
+              <KTPUploader
+                file={file}
+                preview={preview}
+                error={error}
+                onFileChange={handleFile}
+                onRemove={removeFile}
+                onProcess={handleProcessKTP}
+                onSkip={handleSkipOcr}
+                onBack={handleKembaliPilihTemplate}
+                isProcessing={isProcessing}
+              />
+            </div>
+          </>
         )}
 
         {step === 3 && (

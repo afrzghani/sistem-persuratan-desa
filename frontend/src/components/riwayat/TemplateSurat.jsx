@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { CheckCircle2, Files, Plus, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { CheckCircle2, Files, Plus, Search, X } from "lucide-react";
 
 import { createTemplate, getTemplates } from "../../services/templateService";
 
@@ -29,6 +29,21 @@ function TemplateSurat() {
   const [progress, setProgress] = useState(0);
   const [formError, setFormError] = useState("");
   const [pesanSukses, setPesanSukses] = useState("");
+  const [pencarian, setPencarian] = useState("");
+
+  const templatesTampil = useMemo(() => {
+    const kata = pencarian.trim().toLowerCase();
+
+    if (!kata) return templates;
+
+    return templates.filter(
+      (item) =>
+        (item.nama ?? "").toLowerCase().includes(kata) ||
+        (item.fileName ?? "").toLowerCase().includes(kata) ||
+        (item.isi ?? "").toLowerCase().includes(kata) ||
+        (item.kodeSurat ?? "").toLowerCase().includes(kata),
+    );
+  }, [templates, pencarian]);
 
   useEffect(() => {
     if (!pesanSukses) return;
@@ -123,21 +138,50 @@ function TemplateSurat() {
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                formTerbuka ? setFormTerbuka(false) : bukaForm()
-              }
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
-            >
-              {formTerbuka ? (
-                <X className="h-4 w-4" />
-              ) : (
-                <Plus className="h-4 w-4" />
-              )}
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+              <div className="relative w-full sm:w-72">
+                <Search
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                />
 
-              {formTerbuka ? "Tutup Form" : "Tambah Template"}
-            </button>
+                <input
+                  type="text"
+                  placeholder="Cari nama, kode, atau file template..."
+                  value={pencarian}
+                  onChange={(event) => setPencarian(event.target.value)}
+                  className="w-full rounded-lg border border-slate-300 py-2.5 pl-9 pr-9 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                />
+
+                {pencarian && (
+                  <button
+                    type="button"
+                    onClick={() => setPencarian("")}
+                    title="Bersihkan pencarian"
+                    aria-label="Bersihkan pencarian"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  formTerbuka ? setFormTerbuka(false) : bukaForm()
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
+              >
+                {formTerbuka ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+
+                {formTerbuka ? "Tutup Form" : "Tambah Template"}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -167,7 +211,8 @@ function TemplateSurat() {
           </div>
         ) : (
           <TabelTemplateSurat
-            templates={templates}
+            templates={templatesTampil}
+            pencarian={pencarian}
             onLihat={setTemplateDipilih}
           />
         )}

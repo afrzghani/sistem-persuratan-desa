@@ -1,10 +1,16 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Eye, FileText, Files } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, FileText, Files, Search } from "lucide-react";
 
 const PER_PAGE = 8;
 
-function TabelTemplateSurat({ templates, onLihat }) {
+function TabelTemplateSurat({ templates, pencarian = "", onLihat }) {
   const [halaman, setHalaman] = useState(1);
+  const [templatesSebelumnya, setTemplatesSebelumnya] = useState(templates);
+
+  if (templatesSebelumnya !== templates) {
+    setTemplatesSebelumnya(templates);
+    setHalaman(1);
+  }
 
   const totalHalaman = Math.max(1, Math.ceil(templates.length / PER_PAGE));
   const halamanAktif = Math.min(halaman, totalHalaman);
@@ -44,15 +50,36 @@ function TabelTemplateSurat({ templates, onLihat }) {
               <tr>
                 <td colSpan={3} className="px-6 py-12 text-center">
                   <div className="flex flex-col items-center">
-                    <Files className="h-8 w-8 text-slate-300" />
+                    {pencarian.trim() ? (
+                      <>
+                        <Search className="h-8 w-8 text-slate-300" />
 
-                    <p className="mt-3 font-medium text-slate-700">
-                      Belum ada template surat
-                    </p>
+                        <p className="mt-3 font-medium text-slate-700">
+                          Template tidak ditemukan
+                        </p>
 
-                    <p className="mt-1 text-sm text-slate-500">
-                      Template yang terdaftar di server akan muncul di sini.
-                    </p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          Tidak ada template yang cocok dengan{" "}
+                          <span className="font-medium text-slate-600">
+                            &quot;{pencarian.trim()}&quot;
+                          </span>
+                          .
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Files className="h-8 w-8 text-slate-300" />
+
+                        <p className="mt-3 font-medium text-slate-700">
+                          Belum ada template surat
+                        </p>
+
+                        <p className="mt-1 text-sm text-slate-500">
+                          Template yang terdaftar di server akan muncul di
+                          sini.
+                        </p>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>

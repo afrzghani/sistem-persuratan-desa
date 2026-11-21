@@ -93,39 +93,42 @@ function DetailTemplateSurat({ template, onTutup }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header modal */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50">
-              <FileText className="h-5 w-5 text-emerald-600" />
-            </div>
+        {/* Header modal */}
+<div className="flex items-start justify-between gap-4">
+  <div className="flex items-center gap-4">
+    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
+      <FileText className="h-5 w-5 text-emerald-600" />
+    </div>
 
-            <h2
-              id="detail-template-title"
-              className="mt-4 text-lg font-semibold text-slate-800"
-            >
-              {template.nama}
-            </h2>
+    <div>
+      <h2
+        id="detail-template-title"
+        className="text-lg font-semibold text-slate-800"
+      >
+        {template.nama}
+      </h2>
 
-            <p className="mt-1 break-all text-sm text-slate-500">
-              {template.fileName}
-            </p>
+      <p className="mt-1 break-all text-sm text-slate-500">
+        {template.fileName}
+      </p>
 
-            {template.isi && (
-              <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                {template.isi}
-              </p>
-            )}
-          </div>
+      {template.isi && (
+        <p className="mt-2 max-w-2xl text-sm text-slate-600">
+          {template.isi}
+        </p>
+      )}
+    </div>
+  </div>
 
-          <button
-            type="button"
-            onClick={onTutup}
-            aria-label="Tutup detail template"
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+  <button
+    type="button"
+    onClick={onTutup}
+    aria-label="Tutup detail template"
+    className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+  >
+    <X className="h-5 w-5" />
+  </button>
+</div>
 
         {/* Preview dokumen */}
         <div className="mt-6 min-h-0 flex-1 overflow-auto rounded-xl border border-slate-200 bg-slate-100 p-4">

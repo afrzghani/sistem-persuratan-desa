@@ -135,12 +135,19 @@ function TabelSurat({
 
                 <td className="whitespace-nowrap px-6 py-4">
                   <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
                       item.status === "Selesai"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-amber-100 text-amber-700"
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-amber-50 text-amber-700"
                     }`}
                   >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        item.status === "Selesai"
+                          ? "bg-emerald-500"
+                          : "bg-amber-500"
+                      }`}
+                    />
                     {item.status}
                   </span>
                 </td>
