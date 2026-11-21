@@ -11,6 +11,23 @@ export const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): void => {
+  const isDbOffline =
+    (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P1001') ||
+    err instanceof Prisma.PrismaClientInitializationError ||
+    /can't reach database server|econnrefused|connection refused/i.test(err.message);
+
+  if (isDbOffline) {
+    console.warn(
+      '[DB OFFLINE] MySQL di localhost:3306 tidak merespons. Jalankan MySQL dari XAMPP (tab MySQL ??? Start), lalu coba lagi.'
+    );
+    errorResponse(
+      res,
+      'Database tidak dapat dihubungi. Nyalakan MySQL (XAMPP ??? tab MySQL ??? Start), pastikan port 3306 aktif, lalu coba lagi.',
+      503
+    );
+    return;
+  }
+
   console.error('[Error Details]:', err);
 
   if (err instanceof ZodError) {

@@ -90,12 +90,6 @@ async function main() {
       deskripsi: 'Surat keterangan domisili perusahaan.'
     },
     {
-      kodeSurat: 'SKDP2',
-      namaSurat: 'Surat Keterangan Domisili Perusahaan (Variasi 2)',
-      templateFile: 'SKDP2_SURAT KETERANGAN DOMISILI PERUSAHAAN.docx',
-      deskripsi: 'Surat keterangan domisili perusahaan versi kedua.'
-    },
-    {
       kodeSurat: 'SKDPN',
       namaSurat: 'Surat Keterangan Domisili Perusahaan Akta Notaris',
       templateFile: 'SKDPN_SURAT KETERANGAN DOMISILI PERUSAHAAN AKTA NOTARIS.docx',
