@@ -126,9 +126,9 @@ async function main() {
       deskripsi: 'Surat keterangan pembuatan Kartu Keluarga baru.'
     },
     {
-      kodeSurat: 'SPMK2',
+      kodeSurat: 'SPMKT',
       namaSurat: 'Surat Pernyataan Miskin KIS (RT/RW)',
-      templateFile: 'SPMK2_SURAT PERNYATAAN MISKIN KIS.docx',
+      templateFile: 'SPMKT_SURAT PERNYATAAN MISKIN KIS.docx',
       deskripsi: 'Surat pernyataan miskin KIS dengan pengesahan RT/RW.'
     },
     {

@@ -20,7 +20,7 @@ Place Microsoft Word (`.docx`) template files here.
 | `SKJU` | Surat Keterangan Janda Umum | `SKJU_SURAT KETERANGAN JANDA UMUM.docx` |
 | `SKJCM` | Surat Keterangan Janda Cerai Mati | `SKJCM_SURAT KETERANGAN JANDA CERAI MATI.docx` |
 | `SKKK` | Surat Keterangan KK Baru | `SKKK_SURAT KETERANGAN KK BARU.docx` |
-| `SPMK2` | Surat Pernyataan Miskin KIS (RT/RW) | `SPMK2_SURAT PERNYATAAN MISKIN KIS.docx` |
+| `SPMKT` | Surat Pernyataan Miskin KIS (RT/RW) | `SPMKT_SURAT PERNYATAAN MISKIN KIS.docx` |
 | `SKKU` | Surat Keterangan Keringanan UKT | `SKKU_SURAT KETERANGAN KERINGANAN UKT.docx` |
 | `SKTMS` | Surat Keterangan Tidak Mampu Sekolah | `SKTMS_SURAT KETERANGAN TIDAK MAMPU SEKOLAH.docx` |
 | `SKNP` | Surat Keterangan Nadzir Perseorangan | `SKNP_SURAT KETERANGAN NADZIR PERSEORANGAN.docx` |

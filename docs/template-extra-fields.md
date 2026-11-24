@@ -100,25 +100,7 @@ Domisili lembaga/organisasi. KTP yang di-scan adalah orang yang mewakili lembaga
 
 #### `SKDP` — Surat Keterangan Domisili Perusahaan
 
-Versi standar dengan opsional data notaris.
-
-| Field | Label | Tipe | Wajib? |
-|---|---|---|---|
-| `Nama_Perusahaan` | Nama Perusahaan | Teks | Ya |
-| `Jenis_Usaha` | Jenis Usaha | Teks | Ya |
-| `Alamat_Perusahaan` | Alamat Perusahaan | Teks | Ya |
-| `Pimpinan_Perusahaan` | Nama Pimpinan | Teks | Ya |
-| `Jabatan` | Jabatan Pimpinan | Teks | Ya |
-| `Nama_Notaris` | Nama Notaris | Teks | Tidak |
-| `Nomor_Notaris` | Nomor Akta Notaris | Teks | Tidak |
-| `Tanggal_Notaris` | Tanggal Akta Notaris | Tanggal | Tidak |
-| `Akhir_Berlaku` | Tanggal Akhir Berlaku | Tanggal | Tidak |
-
----
-
-#### `SKDP2` — Surat Keterangan Domisili Perusahaan (Variasi 2)
-
-Mirip `SKDP` tapi tanpa data notaris, menggunakan field `Jabatan_Perusahaan` (bukan `Jabatan`).
+Domisili perusahaan standar tanpa akta notaris.
 
 | Field | Label | Tipe | Wajib? |
 |---|---|---|---|
@@ -177,7 +159,7 @@ Surat untuk keperluan beasiswa, keringanan RS, atau bantuan sosial. Butuh nomor 
 
 ---
 
-#### `SPMK2` — Surat Pernyataan Miskin KIS (RT/RW)
+#### `SPMKT` — Surat Pernyataan Miskin KIS (RT/RW)
 
 Versi pernyataan miskin dengan pengesahan RT dan RW serta camat.
 
@@ -352,10 +334,11 @@ Surat wali pernikahan. KTP yang di-scan bisa berupa wali atau pemohon. Semua fie
 | `SPMK` | 1 |
 | `SKDL`, `SKDY` | 2 |
 | `SKUD`, `SKPBU` | 3 |
-| `SKBN`, `SPMK2`, `SKBD`, `SKDU` | 4 |
-| `FPBK`, `SKDP2` | 3–6 |
+| `SKBN`, `SPMKT`, `SKBD`, `SKDU` | 4 |
+| `FPBK` | 3 |
+| `SKDP` | 6 |
 | `SKKU`, `SKTMS`, `SPL` | 6–7 |
-| `SKDP`, `SKDPN` | 9–10 |
+| `SKDPN` | 10 |
 | `SKW` | 13 |
 | `SKNP` | 30 |
 
@@ -364,6 +347,6 @@ Surat wali pernikahan. KTP yang di-scan bisa berupa wali atau pemohon. Semua fie
 ## Catatan Penting untuk Implementasi
 
 1. **`Umur`** pada `SKU` dan `SKUD` tidak dihitung otomatis dari `tanggalLahir`. Operator wajib mengisi manual.
-2. **Data Camat** (`Camat_Menganti`, `Ket_Camat`, `NIP_Camat`) muncul di `SKTM`, `SPMK2`, dan `SPL`. Ke depan bisa disimpan di tabel `DesaSetting` agar tidak perlu diisi berulang.
+2. **Data Camat** (`Camat_Menganti`, `Ket_Camat`, `NIP_Camat`) muncul di `SKTM`, `SPMKT`, dan `SPL`. Ke depan bisa disimpan di tabel `DesaSetting` agar tidak perlu diisi berulang.
 3. **`Status`** pada `SKPBU` berbeda dari `Status_Kawin` yang sudah diisi otomatis — field ini menggunakan nama tag yang berbeda di template docx-nya.
 4. **`SKNP`** adalah template terberat dengan 30 field tambahan. Pertimbangkan memberi UI khusus (misalnya dengan section/accordion per jabatan) agar UX tidak terlalu panjang.

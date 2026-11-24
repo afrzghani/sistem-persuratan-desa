@@ -142,75 +142,6 @@
         "placeholder": "Nama direktur atau pimpinan"
       },
       {
-        "name": "Jabatan",
-        "label": "Jabatan Pimpinan",
-        "type": "text",
-        "required": true,
-        "placeholder": "Contoh: Direktur Utama, Manager"
-      },
-      {
-        "name": "Nama_Notaris",
-        "label": "Nama Notaris",
-        "type": "text",
-        "required": false,
-        "placeholder": "Nama notaris (jika ada)"
-      },
-      {
-        "name": "Nomor_Notaris",
-        "label": "Nomor Akta Notaris",
-        "type": "text",
-        "required": false,
-        "placeholder": "Nomor akta notaris"
-      },
-      {
-        "name": "Tanggal_Notaris",
-        "label": "Tanggal Akta Notaris",
-        "type": "date",
-        "required": false,
-        "placeholder": ""
-      },
-      {
-        "name": "Akhir_Berlaku",
-        "label": "Tanggal Akhir Berlaku Surat",
-        "type": "date",
-        "required": false,
-        "placeholder": ""
-      }
-    ]
-  },
-
-  "SKDP2": {
-    "label": "Surat Keterangan Domisili Perusahaan (Variasi 2)",
-    "fields": [
-      {
-        "name": "Nama_Perusahaan",
-        "label": "Nama Perusahaan",
-        "type": "text",
-        "required": true,
-        "placeholder": "Nama lengkap perusahaan"
-      },
-      {
-        "name": "Jenis_Usaha",
-        "label": "Jenis Usaha",
-        "type": "text",
-        "required": true,
-        "placeholder": "Contoh: Perdagangan, Jasa, Manufaktur"
-      },
-      {
-        "name": "Alamat_Perusahaan",
-        "label": "Alamat Perusahaan",
-        "type": "text",
-        "required": true,
-        "placeholder": "Alamat lengkap lokasi perusahaan"
-      },
-      {
-        "name": "Pimpinan_Perusahaan",
-        "label": "Nama Pimpinan Perusahaan",
-        "type": "text",
-        "required": true,
-        "placeholder": "Nama direktur atau pimpinan"
-      },
-      {
         "name": "Jabatan_Perusahaan",
         "label": "Jabatan Pimpinan di Perusahaan",
         "type": "text",
@@ -384,7 +315,7 @@
     ]
   },
 
-  "SPMK2": {
+  "SPMKT": {
     "label": "Surat Pernyataan Miskin KIS (RT/RW)",
     "fields": [
       {
